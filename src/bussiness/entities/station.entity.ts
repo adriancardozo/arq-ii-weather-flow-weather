@@ -1,6 +1,5 @@
 import { EditStationInput } from '../ports/input/services/dtos/input/edit-station.input';
 import { IEntity } from './i.entity';
-import { User } from './user.entity';
 import { Location } from '../value-objects/location.value-object';
 import { Measurement } from './measurement.entity';
 import { SearchInput } from '../ports/input/services/dtos/input/search.input';
@@ -11,8 +10,8 @@ export class Station extends IEntity<EditStationInput> {
   location: Location;
   sensorModel: string;
   state: 'active' | 'inactive' = 'active';
-  owner: User;
-  subscribers: Array<User> = [];
+  owner: string;
+  subscribers: Array<string> = [];
   measurements: Array<Measurement>;
 
   constructor(id: string);
@@ -21,7 +20,7 @@ export class Station extends IEntity<EditStationInput> {
     name: string,
     location: Location,
     sensorModel: string,
-    owner: User,
+    owner: string,
     state: 'active' | 'inactive',
   );
   constructor(
@@ -29,7 +28,7 @@ export class Station extends IEntity<EditStationInput> {
     name?: string,
     location?: Location,
     sensorModel?: string,
-    owner?: User,
+    owner?: string,
     state: 'active' | 'inactive' = 'active',
   ) {
     super();
@@ -48,16 +47,15 @@ export class Station extends IEntity<EditStationInput> {
     if (location) this.location.edit(location);
     this.sensorModel = sensorModel ?? this.sensorModel;
     this.state = state ?? this.state;
-    if (owner?.id) this.setOwner(new User(owner.id));
+    if (owner?.id) this.setOwner(owner.id);
   }
 
-  setOwner(owner: User | null): void {
-    this.owner = owner ?? new User(null);
+  setOwner(owner: string | null): void {
+    this.owner = owner as any;
   }
 
-  subscribe(user: User) {
+  subscribe(user: string) {
     this.subscribers = [...this.subscribers, user];
-    user.subscribe(this);
   }
 
   addMeasurement(measurement: Measurement) {
@@ -66,9 +64,5 @@ export class Station extends IEntity<EditStationInput> {
 
   search(input: SearchInput): Search {
     return new Search(this, input);
-  }
-
-  private notifyAlert(measurement: Measurement) {
-    this.subscribers?.forEach((subscriber) => subscriber.notifyAlert(measurement));
   }
 }

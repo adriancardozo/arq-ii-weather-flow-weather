@@ -1,5 +1,4 @@
 import { Station } from 'src/bussiness/entities/station.entity';
-import { User } from 'src/bussiness/entities/user.entity';
 import { StationNotFoundError } from 'src/bussiness/errors/station-not-found.error';
 import { UnknownError } from 'src/bussiness/errors/unknown.error';
 import { CreateStationInput } from 'src/bussiness/ports/input/services/dtos/input/create-station.input';
@@ -10,7 +9,7 @@ export const createStationInput: CreateStationInput = mock(CreateStationInput);
 
 export const station: jest.Mocked<Station> = mock(Station);
 
-station.owner = mock(User);
+station.owner = 'user1234abcd';
 
 export const session = new Object({});
 

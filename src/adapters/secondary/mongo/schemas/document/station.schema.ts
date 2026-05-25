@@ -1,6 +1,5 @@
 import { Schema } from 'mongoose';
 import { Measurement } from 'src/bussiness/entities/measurement.entity';
-import { User } from 'src/bussiness/entities/user.entity';
 
 export const StationSchema = new Schema(
   {
@@ -11,8 +10,8 @@ export const StationSchema = new Schema(
     },
     sensorModel: String,
     state: { type: String, enum: ['active', 'inactive'], default: 'active' },
-    owner: { type: Schema.Types.ObjectId, ref: User.name },
-    subscribers: [{ type: Schema.Types.ObjectId, ref: User.name }],
+    owner: { type: String },
+    subscribers: [{ type: String }],
     measurements: [{ type: Schema.Types.ObjectId, ref: Measurement.name }],
   },
   { toJSON: { virtuals: true }, toObject: { virtuals: true } },

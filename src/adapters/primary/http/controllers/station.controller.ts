@@ -8,13 +8,11 @@ import {
   Post,
   Put,
   UseFilters,
-  UseGuards,
   UsePipes,
 } from '@nestjs/common';
 import { VALIDATION_PIPE } from 'src/infrastructure/validation/validation.pipe';
 import { BussinessExceptionFilter } from './filters/bussiness-error.filter';
-import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { ApiBody, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { IdDto } from './dtos/id.dto';
 import { IStationService } from 'src/bussiness/ports/input/services/i-station.service';
 import { StationResponse } from './responses/station.response';
@@ -30,8 +28,6 @@ export class StationController {
   constructor(private readonly stationService: IStationService) {}
 
   @ApiOperation({ summary: 'Get all stations' })
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
   @ApiOkResponse({ type: StationResponse, isArray: true })
   @Get()
   async getAll(): Promise<Array<StationResponse>> {
@@ -40,8 +36,6 @@ export class StationController {
   }
 
   @ApiOperation({ summary: 'Get a station' })
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
   @ApiOkResponse({ type: StationResponse })
   @Get(':id')
   async getById(@Param() param: IdDto): Promise<StationResponse> {
@@ -49,8 +43,6 @@ export class StationController {
   }
 
   @ApiOperation({ summary: 'Create a station' })
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
   @ApiBody({ type: CreateStationDto })
   @ApiOkResponse({ type: StationResponse })
   @Post()
@@ -59,8 +51,6 @@ export class StationController {
   }
 
   @ApiOperation({ summary: 'Delete a station' })
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
   @ApiOkResponse({ type: StationResponse })
   @Delete(':id')
   async delete(@Param() param: IdDto): Promise<StationResponse> {
@@ -68,8 +58,6 @@ export class StationController {
   }
 
   @ApiOperation({ summary: 'Edit a station' })
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
   @ApiBody({ type: EditStationDto })
   @ApiOkResponse({ type: StationResponse })
   @Patch(':id')
@@ -78,8 +66,6 @@ export class StationController {
   }
 
   @ApiOperation({ summary: 'Subscribe to station' })
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
   @ApiOkResponse({ type: SubscribeResponse })
   @Put(':id/subscribe/:user_id')
   async subscribe(@Param() param: SubscribeDto): Promise<SubscribeResponse> {

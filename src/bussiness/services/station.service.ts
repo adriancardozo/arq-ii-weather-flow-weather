@@ -6,7 +6,6 @@ import { CreateStationInput } from '../ports/input/services/dtos/input/create-st
 import { EditStationInput } from '../ports/input/services/dtos/input/edit-station.input';
 import { ITransactionService } from '../ports/output/services/i-transaction.service';
 import { Service } from './service';
-import { IUserRepository } from '../ports/output/repositories/i-user.repository';
 import { SearchInput } from '../ports/input/services/dtos/input/search.input';
 import { Search } from '../aggregates/search.aggergate';
 
@@ -15,19 +14,16 @@ export class StationService<Session = any>
   extends Service<Station, CreateStationInput, EditStationInput, Session>
   implements IStationService
 {
-  constructor(
-    stationRepository: IStationRepository,
-    transactionService: ITransactionService,
-    private readonly userRepository: IUserRepository,
-  ) {
+  constructor(stationRepository: IStationRepository, transactionService: ITransactionService) {
     super(stationRepository, transactionService);
   }
 
   override async create(input: CreateStationInput, session?: Session): Promise<Station> {
     return await this.transactionService.transaction(async (session) => {
       const station = await super.create(input, session);
-      station.owner.addStation(station);
-      await this.userRepository.updateOne(station.owner, session);
+      // TODO: Ver como resolver actualización de estaciones del usuario owner al crear la estación
+      // station.owner.addStation(station);
+      // await this.userRepository.updateOne(station.owner, session);
       return station;
     }, session);
   }
@@ -35,15 +31,16 @@ export class StationService<Session = any>
   override async edit(id: string, input: EditStationInput, session?: Session): Promise<Station> {
     return await this.transactionService.transaction(async (session) => {
       if (!input.owner) return await super.edit(id, input, session);
-      const {
-        owner: { id: oldId },
-      } = await this.repository.findOneByOrFail({ id }, session);
+      // TODO: Ver cómo resolver la actualización del owner viejo y el nuevo si se edita el owner de la estación
+      // const {
+      //   owner: { id: oldId },
+      // } = await this.repository.findOneByOrFail({ id }, session);
       const station = await super.edit(id, input, session);
-      const oldOwner = await this.userRepository.findOneByOrFail({ id: oldId }, session);
-      const owner = await this.userRepository.findOneByOrFail({ id: input.owner.id }, session);
-      oldOwner.removeStation(id);
-      owner.addStation(station);
-      await this.userRepository.updateMany([oldOwner, owner], session);
+      // const oldOwner = await this.userRepository.findOneByOrFail({ id: oldId }, session);
+      // const owner = await this.userRepository.findOneByOrFail({ id: input.owner.id }, session);
+      // oldOwner.removeStation(id);
+      // owner.addStation(station);
+      // await this.userRepository.updateMany([oldOwner, owner], session);
       return station;
     }, session);
   }
@@ -51,12 +48,13 @@ export class StationService<Session = any>
   override async delete(id: string, session?: Session): Promise<Station> {
     return await this.transactionService.transaction(async (session) => {
       const station = await super.delete(id, session);
-      if (station.owner?.id) {
-        const { id: ownerId } = station.owner;
-        const owner = await this.userRepository.findOneByOrFail({ id: ownerId }, session);
-        owner.removeStation(id);
-        await this.userRepository.updateOne(owner, session);
-      }
+      // TODO: Ver cómo resolver la actualización del owner al borrar la estación
+      // if (station.owner?.id) {
+      //   const { id: ownerId } = station.owner;
+      //   const owner = await this.userRepository.findOneByOrFail({ id: ownerId }, session);
+      //   owner.removeStation(id);
+      //   await this.userRepository.updateOne(owner, session);
+      // }
       return station;
     }, session);
   }
@@ -64,9 +62,10 @@ export class StationService<Session = any>
   async subscribe(id: string, userId: string, session?: Session): Promise<Station> {
     return await this.transactionService.transaction(async (session) => {
       const station = await this.repository.findOneByOrFail({ id }, session);
-      const user = await this.userRepository.findOneByOrFail({ id: userId }, session);
-      station.subscribe(user);
-      await this.userRepository.updateOne(user, session);
+      // TODO: Evaluar si resolver como actualizar al usuario suscripto en el otro microservicio
+      // const user = await this.userRepository.findOneByOrFail({ id: userId }, session);
+      // station.subscribe(user);
+      // await this.userRepository.updateOne(user, session);
       return await this.repository.updateOne(station, session);
     }, session);
   }

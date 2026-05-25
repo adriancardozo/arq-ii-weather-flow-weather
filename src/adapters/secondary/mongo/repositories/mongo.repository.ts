@@ -1,6 +1,6 @@
 import { ClientSession, Model, mongo } from 'mongoose';
 import { IEntity } from 'src/bussiness/entities/i.entity';
-import { IRepository } from 'src/bussiness/ports/output/repositories/i.respository';
+import { IRepository } from 'src/bussiness/ports/output/repositories/i.repository';
 import { MongoTransactionService } from '../services/mongo-transaction.service';
 import { plainToInstance } from 'class-transformer';
 import { Logger, Type } from '@nestjs/common';

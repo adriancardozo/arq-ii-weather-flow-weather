@@ -68,7 +68,7 @@ describe('Station', () => {
       describe('Is present', () => {
         it('should change owner id', () => {
           station.edit(editOwnerInput);
-          expect(station.owner).toMatchObject(editOwnerInput.owner as any);
+          expect(station.owner).toEqual(editOwnerInput.owner!.id);
         });
       });
 
