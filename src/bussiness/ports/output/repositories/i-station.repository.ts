@@ -1,5 +1,5 @@
 import { Station } from 'src/bussiness/entities/station.entity';
-import { IRepository } from './i.respository';
+import { IRepository } from './i.repository';
 import { CreateStationInput } from '../../input/services/dtos/input/create-station.input';
 import { EditStationInput } from '../../input/services/dtos/input/edit-station.input';
 

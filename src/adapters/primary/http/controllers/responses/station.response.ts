@@ -22,6 +22,6 @@ export class StationResponse {
     this.location = new LocationResponse(station.location);
     this.sensor_model = station.sensorModel;
     this.state = station.state;
-    this.owner_id = station.owner?.id ?? null;
+    this.owner_id = station.owner ?? null;
   }
 }

@@ -1,4 +1,3 @@
-import { User } from 'src/bussiness/entities/user.entity';
 import { EditStationInput } from 'src/bussiness/ports/input/services/dtos/input/edit-station.input';
 import { Location } from 'src/bussiness/value-objects/location.value-object';
 import { mock } from 'test/resources/mocks/mock';
@@ -11,7 +10,7 @@ export const originalLocation: jest.Mocked<Location> = mock(Location);
 
 export const originalSensorModel = 'Sensor model';
 
-export const originalOwner: jest.Mocked<User> = mock(User);
+export const originalOwner = 'user1234abcd';
 
 export const originalState = 'active';
 
