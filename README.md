@@ -20,11 +20,11 @@ npm run prepare
 
 <blockquote>
 <b>NOTE</b>
-<p>This project uses an Azure Service Bus queue. You can start Azure Service Bus Emulator by running following command</p>
+<p>This project uses an Azure Service Bus queue. You can start Azure Service Bus Emulator by running following command:</p>
 <pre>docker compose -f "docker-compose.yml" up</pre>
-<p>And using following connection string</p>
+<p>And using following connection string:</p>
 <pre>Endpoint=sb://localhost:5672;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;</pre>
-<p>Also you can use <a href="https://www.messentra.com/#download">Messentra</a> configuring following connection string to administrate emulator queues</p>
+<p>Also you can use <a href="https://www.messentra.com/#download">Messentra</a> configuring following connection string to administrate emulator queues:</p>
 <pre>Endpoint=sb://localhost:5300;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;</pre>
 </blockquote>
 
