@@ -18,6 +18,16 @@ Install development hooks:
 npm run prepare
 ```
 
+<blockquote>
+<b>NOTE</b>
+<p>This project uses an Azure Service Bus queue. You can start Azure Service Bus Emulator by running following command</p>
+<pre>docker compose -f "docker-compose.yml" up</pre>
+<p>And using following connection string</p>
+<pre>Endpoint=sb://localhost:5672;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;</pre>
+<p>Also you can use <a href="https://www.messentra.com/#download">Messentra</a> configuring following connection string to administrate emulator queues</p>
+<pre>Endpoint=sb://localhost:5300;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;</pre>
+</blockquote>
+
 Copy `.env.example` file and rename to `.env`.
 Then complete whit environment values
 
@@ -26,6 +36,7 @@ SELF_VERSION=-
 MONGO_URI=<mongo_uri>
 DNS_SERVERS=8.8.8.8,4.4.4.4
 JWT_SECRET=<jwt_secret (e.g. "Secret")>
+SERVICE_BUS_CONNECTION_STRING=<service_bus_connection_string>
 ```
 
 Start project
@@ -52,6 +63,7 @@ SELF_VERSION=-
 MONGO_URI=<mongo_uri>
 DNS_SERVERS=8.8.8.8,4.4.4.4
 JWT_SECRET=<jwt_secret (e.g. "Secret")>
+SERVICE_BUS_CONNECTION_STRING=<service_bus_connection_string>
 ```
 
 Create a container from this image

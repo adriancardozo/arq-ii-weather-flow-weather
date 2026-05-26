@@ -1,0 +1,25 @@
+import { ServiceBusClient } from '@azure/service-bus';
+import { Injectable, Logger } from '@nestjs/common';
+import { UnknownError } from 'src/bussiness/errors/unknown.error';
+import { IQueueService } from 'src/bussiness/ports/output/services/i-queue.service';
+
+@Injectable()
+export class ServiceBusQueueService implements IQueueService {
+  private readonly logger: Logger = new Logger(ServiceBusQueueService.name);
+
+  constructor(private readonly client: ServiceBusClient) {}
+
+  async send<T>(queue: string, data: T): Promise<void> {
+    const sender = this.client.createSender(queue);
+    try {
+      this.logger.log(`Sending message to '${queue}' queue`);
+      await sender.sendMessages([{ body: data }]);
+      this.logger.log(`Message sent to '${queue}' queue`);
+      await sender.close();
+    } catch (error) {
+      this.logger.error(`Error on send message to '${queue}' queue`);
+      this.logger.error(error);
+      throw new UnknownError();
+    }
+  }
+}
