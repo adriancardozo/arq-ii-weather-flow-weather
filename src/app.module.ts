@@ -24,8 +24,12 @@ import { StationSchema } from './adapters/secondary/mongo/schemas/document/stati
 import { Measurement } from './bussiness/entities/measurement.entity';
 import { MeasurementSchema } from './adapters/secondary/mongo/schemas/document/measurement.schema';
 import { SearchController } from './adapters/primary/http/controllers/search.controller';
+import { ServiceBusQueueService } from './adapters/secondary/service-bus/services/service-bus-queue.service';
+import { ServiceBusClient } from '@azure/service-bus';
+import { IAlertService } from './bussiness/ports/output/services/i-alert.service';
+import { AlertService } from './adapters/secondary/users/services/alert.service';
 
-const { mongo, jwt } = configuration();
+const { mongo, jwt, service_bus } = configuration();
 
 @Module({
   imports: [
@@ -40,6 +44,7 @@ const { mongo, jwt } = configuration();
   ],
   controllers: [AppController, MeasurementController, StationController, SearchController],
   providers: [
+    { provide: ServiceBusClient, useValue: new ServiceBusClient(service_bus.connection_string) },
     Logger,
     MeasurementService,
     { provide: IMeasurementService, useExisting: MeasurementService },
@@ -53,6 +58,9 @@ const { mongo, jwt } = configuration();
     { provide: IMeasurementRepository, useExisting: MongoMeasurementRepository },
     MongoStationRepository,
     { provide: IStationRepository, useExisting: MongoStationRepository },
+    ServiceBusQueueService,
+    AlertService,
+    { provide: IAlertService, useExisting: AlertService },
   ],
 })
 export class AppModule {}

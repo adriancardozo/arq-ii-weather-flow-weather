@@ -16,6 +16,7 @@ const configuration = {
   },
   mongo: { uri: process.env.MONGO_URI! },
   jwt: { secret: process.env.JWT_SECRET! },
+  service_bus: { connection_string: process.env.SERVICE_BUS_CONNECTION_STRING! },
 };
 
 export type Configuration = typeof configuration;

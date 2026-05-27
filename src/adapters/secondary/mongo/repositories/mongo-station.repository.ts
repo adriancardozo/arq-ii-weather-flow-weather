@@ -17,10 +17,6 @@ export class MongoStationRepository
     @InjectModel(Station.name) StationModel: Model<Station>,
     transactionService: MongoTransactionService,
   ) {
-    super(StationObject, Station, StationNotFoundError, StationModel, transactionService, [
-      'owner',
-      'subscribers',
-      'measurements',
-    ]);
+    super(StationObject, Station, StationNotFoundError, StationModel, transactionService, ['measurements']);
   }
 }

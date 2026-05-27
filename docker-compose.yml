@@ -1,0 +1,27 @@
+services:
+  servicebus-emulator:
+    image: mcr.microsoft.com/azure-messaging/servicebus-emulator:latest
+    volumes:
+      - './azure-service-bus-emulator/config.json:/ServiceBus_Emulator/ConfigFiles/Config.json'
+    ports:
+      - '5672:5672'
+      - '5300:5300'
+    environment:
+      SQL_SERVER: sqledge
+      MSSQL_SA_PASSWORD: myPassword1234
+      ACCEPT_EULA: 'Y'
+    depends_on:
+      - sqledge
+    networks:
+      weather-flow:
+
+  sqledge:
+    image: mcr.microsoft.com/azure-sql-edge:latest
+    environment:
+      MSSQL_SA_PASSWORD: myPassword1234
+      ACCEPT_EULA: 'Y'
+    networks:
+      weather-flow:
+
+networks:
+  weather-flow:

@@ -24,7 +24,7 @@ export class SearchController {
   @ApiOperation({ summary: 'Search stations' })
   @ApiOkResponse({ type: StationResponse, isArray: true })
   @Get('stations')
-  async searchManyStations(@Query() query: SearchStationDto): Promise<StationResponse[]> {
+  async searchStations(@Query() query: SearchStationDto): Promise<StationResponse[]> {
     return (await this.stationService.searchStations(query.toInput())).map(
       (station) => new StationResponse(station),
     );
