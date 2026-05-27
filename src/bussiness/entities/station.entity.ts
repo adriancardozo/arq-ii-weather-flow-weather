@@ -4,6 +4,7 @@ import { Location } from '../value-objects/location.value-object';
 import { Measurement } from './measurement.entity';
 import { SearchInput } from '../ports/input/services/dtos/input/search.input';
 import { Search } from '../aggregates/search.aggergate';
+import { SearchStationInput } from '../ports/input/services/dtos/input/search-station.input';
 
 export class Station extends IEntity<EditStationInput> {
   name: string;
