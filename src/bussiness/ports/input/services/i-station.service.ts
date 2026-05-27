@@ -3,6 +3,8 @@ import { EditStationInput } from './dtos/input/edit-station.input';
 import { CreateStationInput } from './dtos/input/create-station.input';
 import { SearchInput } from './dtos/input/search.input';
 import { Search } from 'src/bussiness/aggregates/search.aggergate';
+import { SearchStationInput } from './dtos/input/search-station.input';
+import { SearchStation } from 'src/bussiness/aggregates/search-station.aggregate';
 
 export abstract class IStationService {
   abstract getAll(): Promise<Array<Station>>;
@@ -18,4 +20,6 @@ export abstract class IStationService {
   abstract subscribe(id: string, user_id: string): Promise<Station>;
 
   abstract search(query: SearchInput): Promise<Search>;
+
+  abstract searchStations(query: SearchStationInput): Promise<SearchStation>;
 }

@@ -8,6 +8,8 @@ import { ITransactionService } from '../ports/output/services/i-transaction.serv
 import { Service } from './service';
 import { SearchInput } from '../ports/input/services/dtos/input/search.input';
 import { Search } from '../aggregates/search.aggergate';
+import { SearchStationInput } from '../ports/input/services/dtos/input/search-station.input';
+import { SearchStation } from '../aggregates/search-station.aggregate';
 
 @Injectable()
 export class StationService<Session = any>
@@ -74,6 +76,13 @@ export class StationService<Session = any>
     return await this.transactionService.transaction(async (session) => {
       const station = await this.repository.findOneByOrFail({ name: input.station }, session);
       return station.search(input);
+    }, session);
+  }
+
+  async searchStations(input: SearchStationInput, session?: Session): Promise<SearchStation> {
+    return await this.transactionService.transaction(async (session) => {
+      const station = await this.repository.findOneByOrFail({ name: input.station }, session);
+      return station.searchStation(input);
     }, session);
   }
 }

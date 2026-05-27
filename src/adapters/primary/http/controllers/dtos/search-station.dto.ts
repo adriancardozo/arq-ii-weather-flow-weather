@@ -1,13 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsBoolean, IsDate, IsNumber, IsOptional, IsString } from 'class-validator';
+import { SearchStationInput } from 'src/bussiness/ports/input/services/dtos/input/search-station.input';
 import { SearchInput } from 'src/bussiness/ports/input/services/dtos/input/search.input';
 
-export class SearchDto {
+export class SearchStationDto {
   @ApiProperty()
   @IsOptional()
   @IsString()
-  station: string;
+  station?: string;
   @ApiProperty({ required: false })
   @IsOptional()
   @IsNumber()
@@ -18,26 +19,6 @@ export class SearchDto {
   @IsNumber()
   @Transform(({ value }) => parseInt(value))
   max_temperature?: number;
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsNumber()
-  @Transform(({ value }) => parseInt(value))
-  min_pressure?: number;
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsNumber()
-  @Transform(({ value }) => parseInt(value))
-  max_pressure?: number;
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsNumber()
-  @Transform(({ value }) => parseInt(value))
-  min_humidity?: number;
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsNumber()
-  @Transform(({ value }) => parseInt(value))
-  max_humidity?: number;
   @ApiProperty({ required: false })
   @IsOptional()
   @IsBoolean()
@@ -59,16 +40,12 @@ export class SearchDto {
   @IsDate()
   to_date?: Date;
 
-  toInput(): SearchInput {
-    return new SearchInput(
-      this.station,
+  toInput(): SearchStationInput {
+    return new SearchStationInput(
       this.active_range * 60 * 1000,
+      this.station,
       this.min_temperature,
       this.max_temperature,
-      this.min_pressure,
-      this.max_pressure,
-      this.min_humidity,
-      this.max_humidity,
       this.active,
       this.from_date,
       this.to_date,

@@ -5,6 +5,7 @@ import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { SearchDto } from './dtos/search.dto';
 import { IStationService } from 'src/bussiness/ports/input/services/i-station.service';
 import { SearchResponse } from './responses/search.response';
+import { SearchStationDto } from './dtos/search-station.dto';
 
 @Controller('search')
 @UsePipes(VALIDATION_PIPE)
@@ -14,8 +15,15 @@ export class SearchController {
 
   @ApiOperation({ summary: 'Search measurements' })
   @ApiOkResponse({ type: SearchResponse })
-  @Get()
+  @Get('measurement')
   async search(@Query() query: SearchDto): Promise<SearchResponse> {
     return new SearchResponse(await this.stationService.search(query.toInput()));
+  }
+
+  @ApiOperation({ summary: 'Search stations' })
+  @ApiOkResponse({ type: SearchResponse })
+  @Get('stations')
+  async searchManyStations(@Query() query: SearchStationDto): Promise<SearchResponse> {
+    return new SearchResponse(await this.stationService.searchStations(query.toInput()));
   }
 }
