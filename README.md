@@ -37,6 +37,7 @@ MONGO_URI=<mongo_uri>
 DNS_SERVERS=8.8.8.8,4.4.4.4
 JWT_SECRET=<jwt_secret (e.g. "Secret")>
 SERVICE_BUS_CONNECTION_STRING=<service_bus_connection_string>
+PORT=3001
 ```
 
 Start project
@@ -45,7 +46,7 @@ Start project
 npm start
 ```
 
-And then go to http://localhost:3000/docs to open Swagger UI
+And then go to http://localhost:3001/docs to open Swagger UI
 
 ## Start backend project using docker
 
@@ -64,12 +65,13 @@ MONGO_URI=<mongo_uri>
 DNS_SERVERS=8.8.8.8,4.4.4.4
 JWT_SECRET=<jwt_secret (e.g. "Secret")>
 SERVICE_BUS_CONNECTION_STRING=<service_bus_connection_string>
+PORT=3001
 ```
 
 Create a container from this image
 
 ```bash
-docker run -p "3000:3000" --env-file ".env" weather-flow-weather
+docker run -p "3001:3001" --env-file ".env" weather-flow-weather
 ```
 
-And then go to http://localhost:3000/docs to open Swagger UI
+And then go to http://localhost:3001/docs to open Swagger UI
