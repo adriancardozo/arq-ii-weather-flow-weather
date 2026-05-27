@@ -28,6 +28,9 @@ import { ServiceBusQueueService } from './adapters/secondary/service-bus/service
 import { ServiceBusClient } from '@azure/service-bus';
 import { IAlertService } from './bussiness/ports/output/services/i-alert.service';
 import { AlertService } from './adapters/secondary/users/services/alert.service';
+import { HttpModule } from '@nestjs/axios';
+import { UserStationService } from './adapters/secondary/users/services/user-station.service';
+import { IUserStationService } from './bussiness/ports/output/services/i-user-station.service';
 
 const { mongo, jwt, service_bus } = configuration();
 
@@ -41,6 +44,7 @@ const { mongo, jwt, service_bus } = configuration();
     ]),
     JwtModule.register({ global: true, secret: jwt.secret, signOptions: { expiresIn: '10d' } }),
     PassportModule,
+    HttpModule,
   ],
   controllers: [AppController, MeasurementController, StationController, SearchController],
   providers: [
@@ -61,6 +65,8 @@ const { mongo, jwt, service_bus } = configuration();
     ServiceBusQueueService,
     AlertService,
     { provide: IAlertService, useExisting: AlertService },
+    UserStationService,
+    { provide: IUserStationService, useExisting: UserStationService },
   ],
 })
 export class AppModule {}
