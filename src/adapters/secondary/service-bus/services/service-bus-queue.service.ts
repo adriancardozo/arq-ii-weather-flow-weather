@@ -1,10 +1,9 @@
 import { ServiceBusClient } from '@azure/service-bus';
 import { Injectable, Logger } from '@nestjs/common';
 import { UnknownError } from 'src/bussiness/errors/unknown.error';
-import { IQueueService } from 'src/bussiness/ports/output/services/i-queue.service';
 
 @Injectable()
-export class ServiceBusQueueService implements IQueueService {
+export class ServiceBusQueueService {
   private readonly logger: Logger = new Logger(ServiceBusQueueService.name);
 
   constructor(private readonly client: ServiceBusClient) {}
