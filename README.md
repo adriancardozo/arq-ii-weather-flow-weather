@@ -37,6 +37,7 @@ MONGO_URI=<mongo_uri>
 DNS_SERVERS=8.8.8.8,4.4.4.4
 JWT_SECRET=<jwt_secret (e.g. "Secret")>
 SERVICE_BUS_CONNECTION_STRING=<service_bus_connection_string>
+USERS_URL=<users_url>
 PORT=3001
 ```
 
@@ -65,6 +66,7 @@ MONGO_URI=<mongo_uri>
 DNS_SERVERS=8.8.8.8,4.4.4.4
 JWT_SECRET=<jwt_secret (e.g. "Secret")>
 SERVICE_BUS_CONNECTION_STRING=<service_bus_connection_string>
+USERS_URL=<users_url>
 PORT=3001
 ```
 
