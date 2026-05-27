@@ -6,6 +6,7 @@ import { SearchDto } from './dtos/search.dto';
 import { IStationService } from 'src/bussiness/ports/input/services/i-station.service';
 import { SearchResponse } from './responses/search.response';
 import { SearchStationDto } from './dtos/search-station.dto';
+import { StationResponse } from './responses/station.response';
 
 @Controller('search')
 @UsePipes(VALIDATION_PIPE)
@@ -21,9 +22,11 @@ export class SearchController {
   }
 
   @ApiOperation({ summary: 'Search stations' })
-  @ApiOkResponse({ type: SearchResponse })
+  @ApiOkResponse({ type: StationResponse, isArray: true })
   @Get('stations')
-  async searchManyStations(@Query() query: SearchStationDto): Promise<SearchResponse> {
-    return new SearchResponse(await this.stationService.searchStations(query.toInput()));
+  async searchManyStations(@Query() query: SearchStationDto): Promise<StationResponse[]> {
+    return (await this.stationService.searchStations(query.toInput())).map(
+      (station) => new StationResponse(station),
+    );
   }
 }

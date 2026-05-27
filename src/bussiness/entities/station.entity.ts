@@ -5,7 +5,6 @@ import { Measurement } from './measurement.entity';
 import { SearchInput } from '../ports/input/services/dtos/input/search.input';
 import { Search } from '../aggregates/search.aggergate';
 import { SearchStationInput } from '../ports/input/services/dtos/input/search-station.input';
-import { SearchStation } from '../aggregates/search-station.aggregate';
 
 export class Station extends IEntity<EditStationInput> {
   name: string;
@@ -66,9 +65,5 @@ export class Station extends IEntity<EditStationInput> {
 
   search(input: SearchInput): Search {
     return new Search(this, input);
-  }
-
-  searchStation(input: SearchStationInput): SearchStation {
-    return new SearchStation(this, input);
   }
 }
