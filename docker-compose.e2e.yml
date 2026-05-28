@@ -1,0 +1,106 @@
+services:
+  mongo:
+    image: mongo
+    restart: always
+    command: ['--replSet', 'rs0', '--bind_ip_all']
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      weather-flow:
+
+  mongo-init:
+    image: mongo
+    depends_on:
+      mongo:
+        condition: service_healthy
+    entrypoint: >
+      mongosh --host mongo:27017 --authenticationDatabase admin --eval "
+        try {
+          if (!rs.status().ok) {
+            rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'host.docker.internal:27017'}]});
+            print('Replica Set inicializado con éxito');
+          } else {
+            print('Replica Set ya estaba inicializado');
+          }
+        } catch (e) {
+          rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'host.docker.internal:27017'}]});
+          print('Replica Set inicializado tras captura de error');
+        }
+      "
+    networks:
+      weather-flow:
+
+  servicebus-emulator:
+    image: mcr.microsoft.com/azure-messaging/servicebus-emulator:latest
+    volumes:
+      - './azure-service-bus-emulator/config.json:/ServiceBus_Emulator/ConfigFiles/Config.json'
+    ports:
+      - '5672:5672'
+      - '5300:5300'
+    environment:
+      SQL_SERVER: sqledge
+      MSSQL_SA_PASSWORD: myPassword1234
+      ACCEPT_EULA: 'Y'
+    depends_on:
+      - sqledge
+    networks:
+      weather-flow:
+
+  sqledge:
+    image: mcr.microsoft.com/azure-sql-edge:latest
+    environment:
+      MSSQL_SA_PASSWORD: myPassword1234
+      ACCEPT_EULA: 'Y'
+    networks:
+      weather-flow:
+
+  users:
+    build:
+      context: ../arq-ii-weather-flow-users
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    environment:
+      MONGO_URI: mongodb://mongo:27017/
+      DNS_SERVERS: 8.8.8.8,8.8.4.4
+      JWT_SECRET: SECRET
+      SERVICE_BUS_CONNECTION_STRING: Endpoint=sb://servicebus-emulator:5672;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;
+    restart: always
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      weather-flow:
+
+  weather:
+    build:
+      context: ../arq-ii-weather-flow-weather
+      dockerfile: Dockerfile
+    ports:
+      - '3001:3001'
+    environment:
+      MONGO_URI: mongodb://mongo:27017/
+      DNS_SERVERS: 8.8.8.8,8.8.4.4
+      JWT_SECRET: SECRET
+      SERVICE_BUS_CONNECTION_STRING: Endpoint=sb://servicebus-emulator:5672;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;
+      USERS_URL: http://users:3000
+      PORT: 3001
+    restart: always
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      weather-flow:
+
+networks:
+  weather-flow:
+
+volumes:
+  mongo_data:
