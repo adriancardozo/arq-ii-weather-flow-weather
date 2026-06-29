@@ -20,6 +20,8 @@ import { CreateStationDto } from './dtos/create-station.dto';
 import { EditStationDto } from './dtos/edit-station.dto';
 import { SubscribeDto } from './dtos/subscribe.dto';
 import { SubscribeResponse } from './responses/subscribe.response';
+import { CurrentTemperatureResponse } from './responses/current-temperature.response';
+import { LastDayAverageTemperatureResponse } from './responses/last-day-average-temperature.response';
 
 @Controller('station')
 @UsePipes(VALIDATION_PIPE)
@@ -70,5 +72,21 @@ export class StationController {
   @Put(':id/subscribe/:user_id')
   async subscribe(@Param() param: SubscribeDto): Promise<SubscribeResponse> {
     return new SubscribeResponse(await this.stationService.subscribe(param.id, param.user_id));
+  }
+
+  @ApiOperation({ summary: 'Get current temperature by station location' })
+  @ApiOkResponse({ type: CurrentTemperatureResponse })
+  @Get(':id/current-temperature')
+  async getCurrentTemperature(@Param() param: IdDto): Promise<CurrentTemperatureResponse> {
+    const temperature = await this.stationService.getCurrentTemperature(param.id);
+    return new CurrentTemperatureResponse(param.id, temperature);
+  }
+
+  @ApiOperation({ summary: 'Get average temperature of last day by station location' })
+  @ApiOkResponse({ type: LastDayAverageTemperatureResponse })
+  @Get(':id/last-day-average-temperature')
+  async getLastDayAverageTemperature(@Param() param: IdDto): Promise<LastDayAverageTemperatureResponse> {
+    const averageTemperature = await this.stationService.getLastDayAverageTemperature(param.id);
+    return new LastDayAverageTemperatureResponse(param.id, averageTemperature);
   }
 }

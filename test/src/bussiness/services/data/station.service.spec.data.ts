@@ -34,3 +34,17 @@ export const foundByIdStation: jest.Mocked<Station> = mock(Station);
 export const toFindId = '1234abcd';
 
 export const foundStations: Array<jest.Mocked<Station>> = [mock(Station), mock(Station), mock(Station)];
+
+export const currentTemperatureStationId = 'station-temp-1';
+
+export const stationWithLocation = {
+  id: currentTemperatureStationId,
+  location: {
+    latitude: -34.6037,
+    longitude: -58.3816,
+  },
+} as Station;
+
+export const currentTemperature = 22.4;
+
+export const lastDayAverageTemperature = 18.75;
