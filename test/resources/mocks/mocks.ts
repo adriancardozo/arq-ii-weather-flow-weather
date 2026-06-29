@@ -6,10 +6,13 @@ import { IStationRepository } from 'src/bussiness/ports/output/repositories/i-st
 import { MockStationRepository } from './bussiness/ports/output/repositories/mock-station.repository';
 import { IUserStationService } from 'src/bussiness/ports/output/services/i-user-station.service';
 import { MockUserStationService } from './bussiness/ports/output/services/mock-user-station.service';
+import { ICurrentTemperatureService } from 'src/bussiness/ports/output/services/i-current-temperature.service';
+import { MockCurrentTemperatureService } from './bussiness/ports/output/services/mock-current-temperature.service';
 
 export const mocks = {
   [ITransactionService.name]: MockTransactionService,
   [IHashService.name]: MockHashService,
   [IStationRepository.name]: MockStationRepository,
   [IUserStationService.name]: MockUserStationService,
+  [ICurrentTemperatureService.name]: MockCurrentTemperatureService,
 };
