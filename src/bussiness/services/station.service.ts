@@ -10,6 +10,7 @@ import { SearchInput } from '../ports/input/services/dtos/input/search.input';
 import { Search } from '../aggregates/search.aggergate';
 import { SearchStationInput } from '../ports/input/services/dtos/input/search-station.input';
 import { IUserStationService } from '../ports/output/services/i-user-station.service';
+import { ICurrentTemperatureService } from '../ports/output/services/i-current-temperature.service';
 
 @Injectable()
 export class StationService<Session = any>
@@ -18,6 +19,7 @@ export class StationService<Session = any>
 {
   constructor(
     private readonly userStationService: IUserStationService,
+    private readonly currentTemperatureService: ICurrentTemperatureService,
     stationRepository: IStationRepository,
     transactionService: ITransactionService,
   ) {
@@ -76,6 +78,16 @@ export class StationService<Session = any>
         session,
       );
       return stations;
+    }, session);
+  }
+
+  async getCurrentTemperature(id: string, session?: Session): Promise<number> {
+    return await this.transactionService.transaction(async (session) => {
+      const station = await this.repository.findOneByOrFail({ id }, session);
+      return await this.currentTemperatureService.getCurrentByCoordinates(
+        station.location.latitude,
+        station.location.longitude,
+      );
     }, session);
   }
 }

@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { BaseExceptionFilter, HttpAdapterHost } from '@nestjs/core';
 import { BussinessError } from 'src/bussiness/errors/bussiness.error';
+import { CurrentTemperatureNotFoundError } from 'src/bussiness/errors/current-temperature-not-found.error';
 import { MeasurementNotFoundError } from 'src/bussiness/errors/measurement-not-found.error';
 import { StationNotFoundError } from 'src/bussiness/errors/station-not-found.error';
 
@@ -24,6 +25,8 @@ export class BussinessExceptionFilter implements ExceptionFilter {
     try {
       if (exception instanceof MeasurementNotFoundError) throw new NotFoundException(exception.message);
       if (exception instanceof StationNotFoundError) throw new NotFoundException(exception.message);
+      if (exception instanceof CurrentTemperatureNotFoundError)
+        throw new NotFoundException(exception.message);
       throw new InternalServerErrorException();
     } catch (error) {
       this.logger.error(error);
