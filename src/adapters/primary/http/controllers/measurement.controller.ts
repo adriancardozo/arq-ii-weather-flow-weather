@@ -1,4 +1,15 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseFilters, UsePipes } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseFilters,
+  UseInterceptors,
+  UsePipes,
+} from '@nestjs/common';
 import { VALIDATION_PIPE } from 'src/infrastructure/validation/validation.pipe';
 import { BussinessExceptionFilter } from './filters/bussiness-error.filter';
 import { ApiBody, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
@@ -7,10 +18,12 @@ import { IMeasurementService } from 'src/bussiness/ports/input/services/i-measur
 import { MeasurementResponse } from './responses/measurement.response';
 import { CreateMeasurementDto } from './dtos/create-measurement.dto';
 import { EditMeasurementDto } from './dtos/edit-measurement.dto';
+import { RequestTimeoutInterceptor } from 'src/infrastructure/interceptors/request-timeout.interceptor';
 
 @Controller('measurement')
 @UsePipes(VALIDATION_PIPE)
 @UseFilters(BussinessExceptionFilter)
+@UseInterceptors(RequestTimeoutInterceptor)
 export class MeasurementController {
   constructor(private readonly measurementService: IMeasurementService) {}
 

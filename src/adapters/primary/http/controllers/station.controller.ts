@@ -8,6 +8,7 @@ import {
   Post,
   Put,
   UseFilters,
+  UseInterceptors,
   UsePipes,
 } from '@nestjs/common';
 import { VALIDATION_PIPE } from 'src/infrastructure/validation/validation.pipe';
@@ -23,10 +24,12 @@ import { SubscribeResponse } from './responses/subscribe.response';
 import { CurrentTemperatureResponse } from './responses/current-temperature.response';
 import { LastDayAverageTemperatureResponse } from './responses/last-day-average-temperature.response';
 import { LastWeekAverageTemperatureResponse } from './responses/last-week-average-temperature.response';
+import { RequestTimeoutInterceptor } from 'src/infrastructure/interceptors/request-timeout.interceptor';
 
 @Controller('station')
 @UsePipes(VALIDATION_PIPE)
 @UseFilters(BussinessExceptionFilter)
+@UseInterceptors(RequestTimeoutInterceptor)
 export class StationController {
   constructor(private readonly stationService: IStationService) {}
 
