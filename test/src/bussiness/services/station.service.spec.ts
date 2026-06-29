@@ -4,7 +4,10 @@ import configuration from 'src/infrastructure/configuration/configuration';
 import { mock } from 'test/resources/mocks/mock';
 import { ITransactionService } from 'src/bussiness/ports/output/services/i-transaction.service';
 import { MockTransactionService } from 'test/resources/mocks/bussiness/ports/output/services/mock-transaction.service';
+import { ICurrentTemperatureService } from 'src/bussiness/ports/output/services/i-current-temperature.service';
 import {
+  currentTemperature,
+  currentTemperatureStationId,
   deletedStation,
   deleteStationId,
   editedStation,
@@ -15,6 +18,7 @@ import {
   createStationInput,
   notFoundError,
   session,
+  stationWithLocation,
   toEditStation,
   toFindId,
   unknownError,
@@ -27,6 +31,7 @@ describe('StationService', () => {
   let stationService: StationService;
   let stationRepository: jest.Mocked<IStationRepository>;
   let transactionService: jest.Mocked<ITransactionService>;
+  let currentTemperatureService: jest.Mocked<ICurrentTemperatureService>;
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
@@ -39,6 +44,8 @@ describe('StationService', () => {
     stationService = app.get<StationService>(StationService);
     transactionService = app.get<jest.Mocked<ITransactionService>>(ITransactionService);
     stationRepository = app.get<jest.Mocked<IStationRepository>>(IStationRepository);
+    currentTemperatureService =
+      app.get<jest.Mocked<ICurrentTemperatureService>>(ICurrentTemperatureService);
   });
 
   describe('GetAll', () => {
@@ -294,6 +301,59 @@ describe('StationService', () => {
 
       it('should fail if error on find station', async () => {
         const result = stationService.edit(editStationId, editStationInput, session);
+        await expect(result).rejects.toEqual(unknownError);
+      });
+    });
+  });
+
+  describe('GetCurrentTemperature', () => {
+    beforeEach(() => {
+      stationRepository.findOneByOrFail.mockResolvedValue(stationWithLocation);
+      currentTemperatureService.getCurrentByCoordinates.mockResolvedValue(currentTemperature);
+    });
+
+    it('should return current temperature', async () => {
+      const result = await stationService.getCurrentTemperature(currentTemperatureStationId, session);
+      expect(result).toEqual(currentTemperature);
+    });
+
+    it('should find station', async () => {
+      await stationService.getCurrentTemperature(currentTemperatureStationId, session);
+      expect(stationRepository.findOneByOrFail).toHaveBeenCalledWith(
+        { id: currentTemperatureStationId },
+        session,
+      );
+    });
+
+    it('should query temperature service using station location', async () => {
+      await stationService.getCurrentTemperature(currentTemperatureStationId, session);
+      expect(currentTemperatureService.getCurrentByCoordinates).toHaveBeenCalledWith(-34.6037, -58.3816);
+    });
+
+    it('should execute in transaction', async () => {
+      const transaction = jest.spyOn(transactionService, 'transaction');
+      await stationService.getCurrentTemperature(currentTemperatureStationId, session);
+      expect(transaction).toHaveBeenCalled();
+    });
+
+    describe('Station not found', () => {
+      beforeEach(() => {
+        stationRepository.findOneByOrFail.mockRejectedValue(notFoundError);
+      });
+
+      it('should fail if station not found', async () => {
+        const result = stationService.getCurrentTemperature(currentTemperatureStationId, session);
+        await expect(result).rejects.toEqual(notFoundError);
+      });
+    });
+
+    describe('Current temperature query error', () => {
+      beforeEach(() => {
+        currentTemperatureService.getCurrentByCoordinates.mockRejectedValue(unknownError);
+      });
+
+      it('should fail if error on query current temperature', async () => {
+        const result = stationService.getCurrentTemperature(currentTemperatureStationId, session);
         await expect(result).rejects.toEqual(unknownError);
       });
     });
