@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { Connection } from 'mongoose';
 import { CurrentTemperatureNotFoundError } from 'src/bussiness/errors/current-temperature-not-found.error';
 import { LastDayAverageTemperatureNotFoundError } from 'src/bussiness/errors/last-day-average-temperature-not-found.error';
+import { LastWeekAverageTemperatureNotFoundError } from 'src/bussiness/errors/last-week-average-temperature-not-found.error';
 import { ICurrentTemperatureService } from 'src/bussiness/ports/output/services/i-current-temperature.service';
 
 type ObservationDocument = {
@@ -101,6 +102,53 @@ export class CurrentTemperatureService implements ICurrentTemperatureService {
 
     if (typeof result?.average_temp !== 'number') {
       throw new LastDayAverageTemperatureNotFoundError(latitude, longitude);
+    }
+
+    return result.average_temp;
+  }
+
+  async getLastWeekAverageByCoordinates(latitude: number, longitude: number): Promise<number> {
+    const weatherDb = this.connection.useDb(this.dbName, { useCache: true });
+    const weatherCollection = weatherDb.collection<ObservationDocument>(this.collectionName);
+    const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+    const [result] = await weatherCollection
+      .aggregate<{ average_temp?: number }>([
+        {
+          $match: {
+            latitude,
+            longitude,
+          },
+        },
+        { $unwind: '$observations' },
+        {
+          $addFields: {
+            observation_date: { $toDate: '$observations.datetime' },
+          },
+        },
+        {
+          $match: {
+            observation_date: { $gte: oneWeekAgo },
+            'observations.temp': { $type: 'number' },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            average_temp: { $avg: '$observations.temp' },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            average_temp: 1,
+          },
+        },
+      ])
+      .toArray();
+
+    if (typeof result?.average_temp !== 'number') {
+      throw new LastWeekAverageTemperatureNotFoundError(latitude, longitude);
     }
 
     return result.average_temp;

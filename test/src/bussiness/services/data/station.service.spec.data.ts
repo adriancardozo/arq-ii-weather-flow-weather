@@ -48,3 +48,5 @@ export const stationWithLocation = {
 export const currentTemperature = 22.4;
 
 export const lastDayAverageTemperature = 18.75;
+
+export const lastWeekAverageTemperature = 20.15;

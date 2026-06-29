@@ -17,6 +17,7 @@ import {
   foundStations,
   createStationInput,
   lastDayAverageTemperature,
+  lastWeekAverageTemperature,
   notFoundError,
   session,
   stationWithLocation,
@@ -414,6 +415,67 @@ describe('StationService', () => {
 
       it('should fail if error on query last day average', async () => {
         const result = stationService.getLastDayAverageTemperature(currentTemperatureStationId, session);
+        await expect(result).rejects.toEqual(unknownError);
+      });
+    });
+  });
+
+  describe('GetLastWeekAverageTemperature', () => {
+    beforeEach(() => {
+      stationRepository.findOneByOrFail.mockResolvedValue(stationWithLocation);
+      currentTemperatureService.getLastWeekAverageByCoordinates.mockResolvedValue(
+        lastWeekAverageTemperature,
+      );
+    });
+
+    it('should return last week average temperature', async () => {
+      const result = await stationService.getLastWeekAverageTemperature(
+        currentTemperatureStationId,
+        session,
+      );
+      expect(result).toEqual(lastWeekAverageTemperature);
+    });
+
+    it('should find station', async () => {
+      await stationService.getLastWeekAverageTemperature(currentTemperatureStationId, session);
+      expect(stationRepository.findOneByOrFail).toHaveBeenCalledWith(
+        { id: currentTemperatureStationId },
+        session,
+      );
+    });
+
+    it('should query average service using station location', async () => {
+      await stationService.getLastWeekAverageTemperature(currentTemperatureStationId, session);
+      expect(currentTemperatureService.getLastWeekAverageByCoordinates).toHaveBeenCalledWith(
+        -34.6037,
+        -58.3816,
+      );
+    });
+
+    it('should execute in transaction', async () => {
+      const transaction = jest.spyOn(transactionService, 'transaction');
+      await stationService.getLastWeekAverageTemperature(currentTemperatureStationId, session);
+      expect(transaction).toHaveBeenCalled();
+    });
+
+    describe('Station not found', () => {
+      beforeEach(() => {
+        stationRepository.findOneByOrFail.mockRejectedValue(notFoundError);
+      });
+
+      it('should fail if station not found', async () => {
+        const result = stationService.getLastWeekAverageTemperature(currentTemperatureStationId, session);
+        await expect(result).rejects.toEqual(notFoundError);
+      });
+    });
+
+    describe('Last week average query error', () => {
+      beforeEach(() => {
+        currentTemperatureService.getLastWeekAverageByCoordinates.mockRejectedValue(unknownError);
+      });
+
+      it('should fail if error on query last week average', async () => {
+        const result = stationService.getLastWeekAverageTemperature(currentTemperatureStationId, session);
         await expect(result).rejects.toEqual(unknownError);
       });
     });

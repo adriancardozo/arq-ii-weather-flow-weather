@@ -8,4 +8,8 @@ export class MockCurrentTemperatureService implements ICurrentTemperatureService
   getLastDayAverageByCoordinates(latitude: number, longitude: number): Promise<number> {
     throw new Error('Method not implemented.');
   }
+
+  getLastWeekAverageByCoordinates(latitude: number, longitude: number): Promise<number> {
+    throw new Error('Method not implemented.');
+  }
 }

@@ -100,4 +100,14 @@ export class StationService<Session = any>
       );
     }, session);
   }
+
+  async getLastWeekAverageTemperature(id: string, session?: Session): Promise<number> {
+    return await this.transactionService.transaction(async (session) => {
+      const station = await this.repository.findOneByOrFail({ id }, session);
+      return await this.currentTemperatureService.getLastWeekAverageByCoordinates(
+        station.location.latitude,
+        station.location.longitude,
+      );
+    }, session);
+  }
 }

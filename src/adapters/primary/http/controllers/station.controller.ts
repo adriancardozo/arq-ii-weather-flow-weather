@@ -22,6 +22,7 @@ import { SubscribeDto } from './dtos/subscribe.dto';
 import { SubscribeResponse } from './responses/subscribe.response';
 import { CurrentTemperatureResponse } from './responses/current-temperature.response';
 import { LastDayAverageTemperatureResponse } from './responses/last-day-average-temperature.response';
+import { LastWeekAverageTemperatureResponse } from './responses/last-week-average-temperature.response';
 
 @Controller('station')
 @UsePipes(VALIDATION_PIPE)
@@ -88,5 +89,13 @@ export class StationController {
   async getLastDayAverageTemperature(@Param() param: IdDto): Promise<LastDayAverageTemperatureResponse> {
     const averageTemperature = await this.stationService.getLastDayAverageTemperature(param.id);
     return new LastDayAverageTemperatureResponse(param.id, averageTemperature);
+  }
+
+  @ApiOperation({ summary: 'Get average temperature of last week by station location' })
+  @ApiOkResponse({ type: LastWeekAverageTemperatureResponse })
+  @Get(':id/last-week-average-temperature')
+  async getLastWeekAverageTemperature(@Param() param: IdDto): Promise<LastWeekAverageTemperatureResponse> {
+    const averageTemperature = await this.stationService.getLastWeekAverageTemperature(param.id);
+    return new LastWeekAverageTemperatureResponse(param.id, averageTemperature);
   }
 }
