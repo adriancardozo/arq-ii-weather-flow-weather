@@ -23,6 +23,14 @@ const configuration = {
   users: {
     url: process.env.USERS_URL!,
     timeout_ms: process.env.USERS_TIMEOUT_MS ? parseInt(process.env.USERS_TIMEOUT_MS, 10) : 1200,
+    circuit_breaker: {
+      failure_threshold: process.env.USERS_CB_FAILURE_THRESHOLD
+        ? parseInt(process.env.USERS_CB_FAILURE_THRESHOLD, 10)
+        : 3,
+      reset_timeout_ms: process.env.USERS_CB_RESET_TIMEOUT_MS
+        ? parseInt(process.env.USERS_CB_RESET_TIMEOUT_MS, 10)
+        : 10000,
+    },
   },
 };
 
