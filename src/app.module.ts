@@ -33,6 +33,7 @@ import { UserStationService } from './adapters/secondary/users/services/user-sta
 import { IUserStationService } from './bussiness/ports/output/services/i-user-station.service';
 import { ICurrentTemperatureService } from './bussiness/ports/output/services/i-current-temperature.service';
 import { CurrentTemperatureService } from './bussiness/mongo/services/current-temperature.service';
+import { ConfigService } from '@nestjs/config';
 
 const { mongo, jwt, service_bus } = configuration();
 
@@ -52,6 +53,7 @@ const { mongo, jwt, service_bus } = configuration();
   providers: [
     { provide: ServiceBusClient, useValue: new ServiceBusClient(service_bus.connection_string) },
     Logger,
+    ConfigService,
     MeasurementService,
     { provide: IMeasurementService, useExisting: MeasurementService },
     StationService,

@@ -20,9 +20,13 @@ const configuration = {
   mongo: { uri: process.env.MONGO_URI! },
   jwt: { secret: process.env.JWT_SECRET! },
   service_bus: { connection_string: process.env.SERVICE_BUS_CONNECTION_STRING! },
+  alerts: {
+    fallback_enabled: process.env.ALERTS_FALLBACK_ENABLED !== 'false',
+  },
   users: {
     url: process.env.USERS_URL!,
     timeout_ms: process.env.USERS_TIMEOUT_MS ? parseInt(process.env.USERS_TIMEOUT_MS, 10) : 1200,
+    fallback_enabled: process.env.USERS_FALLBACK_ENABLED !== 'false',
     circuit_breaker: {
       failure_threshold: process.env.USERS_CB_FAILURE_THRESHOLD
         ? parseInt(process.env.USERS_CB_FAILURE_THRESHOLD, 10)
