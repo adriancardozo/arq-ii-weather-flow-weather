@@ -31,6 +31,9 @@ import { AlertService } from './adapters/secondary/users/services/alert.service'
 import { HttpModule } from '@nestjs/axios';
 import { UserStationService } from './adapters/secondary/users/services/user-station.service';
 import { IUserStationService } from './bussiness/ports/output/services/i-user-station.service';
+import { ICurrentTemperatureService } from './bussiness/ports/output/services/i-current-temperature.service';
+import { CurrentTemperatureService } from './bussiness/mongo/services/current-temperature.service';
+import { ConfigService } from '@nestjs/config';
 
 const { mongo, jwt, service_bus } = configuration();
 
@@ -50,6 +53,7 @@ const { mongo, jwt, service_bus } = configuration();
   providers: [
     { provide: ServiceBusClient, useValue: new ServiceBusClient(service_bus.connection_string) },
     Logger,
+    ConfigService,
     MeasurementService,
     { provide: IMeasurementService, useExisting: MeasurementService },
     StationService,
@@ -67,6 +71,8 @@ const { mongo, jwt, service_bus } = configuration();
     { provide: IAlertService, useExisting: AlertService },
     UserStationService,
     { provide: IUserStationService, useExisting: UserStationService },
+    CurrentTemperatureService,
+    { provide: ICurrentTemperatureService, useExisting: CurrentTemperatureService },
   ],
 })
 export class AppModule {}

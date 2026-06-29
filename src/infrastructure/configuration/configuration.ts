@@ -13,11 +13,29 @@ const configuration = {
     docs: { path: 'docs' },
     health_string: 'Hello World!',
     dns_servers: process.env.DNS_SERVERS?.split(',') ?? [],
+    request_timeout_ms: process.env.APP_REQUEST_TIMEOUT_MS
+      ? parseInt(process.env.APP_REQUEST_TIMEOUT_MS, 10)
+      : 1500,
   },
   mongo: { uri: process.env.MONGO_URI! },
   jwt: { secret: process.env.JWT_SECRET! },
   service_bus: { connection_string: process.env.SERVICE_BUS_CONNECTION_STRING! },
-  users: { url: process.env.USERS_URL! },
+  alerts: {
+    fallback_enabled: process.env.ALERTS_FALLBACK_ENABLED !== 'false',
+  },
+  users: {
+    url: process.env.USERS_URL!,
+    timeout_ms: process.env.USERS_TIMEOUT_MS ? parseInt(process.env.USERS_TIMEOUT_MS, 10) : 1200,
+    fallback_enabled: process.env.USERS_FALLBACK_ENABLED !== 'false',
+    circuit_breaker: {
+      failure_threshold: process.env.USERS_CB_FAILURE_THRESHOLD
+        ? parseInt(process.env.USERS_CB_FAILURE_THRESHOLD, 10)
+        : 3,
+      reset_timeout_ms: process.env.USERS_CB_RESET_TIMEOUT_MS
+        ? parseInt(process.env.USERS_CB_RESET_TIMEOUT_MS, 10)
+        : 10000,
+    },
+  },
 };
 
 export type Configuration = typeof configuration;
