@@ -23,4 +23,6 @@ export abstract class IStationService {
   abstract searchStations(query: SearchStationInput): Promise<Station[]>;
 
   abstract getCurrentTemperature(id: string): Promise<number>;
+
+  abstract getLastDayAverageTemperature(id: string): Promise<number>;
 }
