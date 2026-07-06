@@ -33,6 +33,8 @@ import { UserStationService } from './adapters/secondary/users/services/user-sta
 import { IUserStationService } from './bussiness/ports/output/services/i-user-station.service';
 import { ServiceBusProcessorManager } from './adapters/primary/queue/helpers/service-bus-processor-manager.helper';
 import { MeasurementProcessor } from './adapters/primary/queue/processors/measurement.processor';
+import { OpenWeatherMapProviderService } from './adapters/secondary/open-weather-map/services/open-weather-map-provider.service';
+import { IWeatherProviderService } from './bussiness/ports/output/services/i-weather-provider.service';
 
 const { mongo, jwt, service_bus } = configuration();
 
@@ -75,6 +77,8 @@ const { mongo, jwt, service_bus } = configuration();
     { provide: IAlertService, useExisting: AlertService },
     UserStationService,
     { provide: IUserStationService, useExisting: UserStationService },
+    OpenWeatherMapProviderService,
+    { provide: IWeatherProviderService, useExisting: OpenWeatherMapProviderService },
   ],
 })
 export class AppModule {}

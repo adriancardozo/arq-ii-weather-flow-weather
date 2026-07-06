@@ -4,6 +4,7 @@ import { CreateStationInput } from './dtos/input/create-station.input';
 import { SearchInput } from './dtos/input/search.input';
 import { Search } from 'src/bussiness/aggregates/search.aggergate';
 import { SearchStationInput } from './dtos/input/search-station.input';
+import { Measurement } from 'src/bussiness/entities/measurement.entity';
 
 export abstract class IStationService {
   abstract getAll(): Promise<Array<Station>>;
@@ -21,4 +22,6 @@ export abstract class IStationService {
   abstract search(query: SearchInput): Promise<Search>;
 
   abstract searchStations(query: SearchStationInput): Promise<Station[]>;
+
+  abstract getCurrentTemperature(id: string): Promise<Measurement>;
 }

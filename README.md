@@ -1,4 +1,4 @@
-# Weather Flow - Users (Arquitectura de Software II)
+# Weather Flow - Weather (Arquitectura de Software II)
 
 ## Start project locally
 
@@ -39,6 +39,8 @@ JWT_SECRET=<jwt_secret (e.g. "Secret")>
 SERVICE_BUS_CONNECTION_STRING=<service_bus_connection_string>
 USERS_URL=<users_url>
 PORT=3001
+OPEN_WEATHER_MAP_URL=<open_weather_map_url>
+OPEN_WEATHER_MAP_KEY=<open_weather_map_key>
 ```
 
 Start project
@@ -68,6 +70,8 @@ JWT_SECRET=<jwt_secret (e.g. "Secret")>
 SERVICE_BUS_CONNECTION_STRING=<service_bus_connection_string>
 USERS_URL=<users_url>
 PORT=3001
+OPEN_WEATHER_MAP_URL=<open_weather_map_url>
+OPEN_WEATHER_MAP_KEY=<open_weather_map_key>
 ```
 
 Create a container from this image
