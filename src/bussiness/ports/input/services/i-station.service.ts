@@ -21,4 +21,6 @@ export abstract class IStationService {
   abstract search(query: SearchInput): Promise<Search>;
 
   abstract searchStations(query: SearchStationInput): Promise<Station[]>;
+
+  abstract synchronizeStations(): Promise<Array<Station>>;
 }

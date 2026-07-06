@@ -39,6 +39,10 @@ JWT_SECRET=<jwt_secret (e.g. "Secret")>
 SERVICE_BUS_CONNECTION_STRING=<service_bus_connection_string>
 USERS_URL=<users_url>
 PORT=3001
+SCHEDULER_SYNCHRONIZE_STATIONS=<synchronize_stations_chron_scheduler (default every five minutes: '0 */5 * * * *')>
+SCHEDULER_SYNCHRONIZE_STATIONS_DISABLED=<synchronize_stations_disabled_scheduler (default: 'false')>
+OPEN_WEATHER_MAP_URL=<open_weather_map_url>
+OPEN_WEATHER_MAP_KEY=<open_weather_map_key>
 ```
 
 Start project
@@ -68,6 +72,10 @@ JWT_SECRET=<jwt_secret (e.g. "Secret")>
 SERVICE_BUS_CONNECTION_STRING=<service_bus_connection_string>
 USERS_URL=<users_url>
 PORT=3001
+SCHEDULER_SYNCHRONIZE_STATIONS=<synchronize_stations_chron_scheduler (default every five minutes: '0 */5 * * * *')>
+SCHEDULER_SYNCHRONIZE_STATIONS_DISABLED=<synchronize_stations_disabled_scheduler (default: 'false')>
+OPEN_WEATHER_MAP_URL=<open_weather_map_url>
+OPEN_WEATHER_MAP_KEY=<open_weather_map_key>
 ```
 
 Create a container from this image

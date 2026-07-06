@@ -8,4 +8,6 @@ export abstract class IStationRepository<Session = any> extends IRepository<
   CreateStationInput,
   EditStationInput,
   Session
-> {}
+> {
+  abstract findWithProvider(session: Session): Promise<Array<Station>>;
+}

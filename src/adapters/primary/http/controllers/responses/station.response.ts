@@ -14,6 +14,8 @@ export class StationResponse {
   @ApiProperty()
   state: 'active' | 'inactive';
   @ApiProperty()
+  provider: 'OpenWeatherMap' | null;
+  @ApiProperty()
   owner_id: string | null;
 
   constructor(station: Station) {
@@ -22,6 +24,7 @@ export class StationResponse {
     this.location = new LocationResponse(station.location);
     this.sensor_model = station.sensorModel;
     this.state = station.state;
+    this.provider = station.provider ?? null;
     this.owner_id = station.owner ?? null;
   }
 }

@@ -12,6 +12,7 @@ export class EditStationInput {
     public sensorModel?: string,
     public state?: 'active' | 'inactive',
     ownerId?: string,
+    public provider?: 'OpenWeatherMap' | null,
   ) {
     this.owner = ownerId ? new EditStationOwnerInput(ownerId) : undefined;
     this.location =

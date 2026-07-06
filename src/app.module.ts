@@ -31,6 +31,11 @@ import { AlertService } from './adapters/secondary/users/services/alert.service'
 import { HttpModule } from '@nestjs/axios';
 import { UserStationService } from './adapters/secondary/users/services/user-station.service';
 import { IUserStationService } from './bussiness/ports/output/services/i-user-station.service';
+import { ScheduleModule } from '@nestjs/schedule';
+import { StationScheduler } from './adapters/primary/nestjs-schedule/schedulers/station.scheduler';
+import { WeatherProviderManagerService } from './adapters/secondary/weather-providers/services/weather-provider-manager.service';
+import { IWeatherProviderManagerService } from './bussiness/ports/output/services/i-weather-provider-manager.service';
+import { OpenWeatherMapService } from './adapters/secondary/weather-providers/services/open-weather-map.service';
 
 const { mongo, jwt, service_bus } = configuration();
 
@@ -45,11 +50,16 @@ const { mongo, jwt, service_bus } = configuration();
     JwtModule.register({ global: true, secret: jwt.secret, signOptions: { expiresIn: '10d' } }),
     PassportModule,
     HttpModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController, MeasurementController, StationController, SearchController],
   providers: [
+    StationScheduler,
     { provide: ServiceBusClient, useValue: new ServiceBusClient(service_bus.connection_string) },
     Logger,
+    OpenWeatherMapService,
+    WeatherProviderManagerService,
+    { provide: IWeatherProviderManagerService, useExisting: WeatherProviderManagerService },
     MeasurementService,
     { provide: IMeasurementService, useExisting: MeasurementService },
     StationService,

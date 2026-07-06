@@ -27,6 +27,10 @@ export class EditStationDto {
   @IsOptional()
   @IsString()
   owner_id?: string;
+  @ApiProperty({ enum: ['OpenWeatherMap'], default: null, nullable: true, required: false })
+  @IsOptional()
+  @IsIn(['OpenWeatherMap', null])
+  provider?: 'OpenWeatherMap' | null;
 
   toInput(): EditStationInput {
     return new EditStationInput(
@@ -36,6 +40,7 @@ export class EditStationDto {
       this.sensor_model,
       this.state,
       this.owner_id,
+      this.provider,
     );
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { IStationService } from '../ports/input/services/i-station.service';
 import { IStationRepository } from '../ports/output/repositories/i-station.repository';
 import { Station } from '../entities/station.entity';
@@ -10,14 +10,20 @@ import { SearchInput } from '../ports/input/services/dtos/input/search.input';
 import { Search } from '../aggregates/search.aggergate';
 import { SearchStationInput } from '../ports/input/services/dtos/input/search-station.input';
 import { IUserStationService } from '../ports/output/services/i-user-station.service';
+import { MeasurementService } from './measurement.service';
+import { IWeatherProviderManagerService } from '../ports/output/services/i-weather-provider-manager.service';
 
 @Injectable()
 export class StationService<Session = any>
-  extends Service<Station, CreateStationInput, EditStationInput, Session>
+  extends Service<Station, CreateStationInput, EditStationInput, Session, IStationRepository>
   implements IStationService
 {
+  private readonly logger: Logger = new Logger(StationService.name);
+
   constructor(
     private readonly userStationService: IUserStationService,
+    private readonly measurementService: MeasurementService,
+    private readonly providerManagerService: IWeatherProviderManagerService,
     stationRepository: IStationRepository,
     transactionService: ITransactionService,
   ) {
@@ -77,5 +83,26 @@ export class StationService<Session = any>
       );
       return stations;
     }, session);
+  }
+
+  async synchronizeStations(session?: Session): Promise<Array<Station>> {
+    return this.transactionService.transaction(async (session) => {
+      const stations = await this.repository.findWithProvider(session);
+      for (const station of stations) await this.synchronizeStation(station, session);
+      return stations;
+    }, session);
+  }
+
+  private async synchronizeStation(station: Station, session: Session): Promise<void> {
+    try {
+      const providerService = this.providerManagerService.getProviderService(station.provider!);
+      const measurementInput = await providerService.measure(station.id, station.location);
+      await this.measurementService.create(measurementInput, session);
+    } catch (error) {
+      this.logger.error(error);
+      this.logger.error(
+        `Error on synchronize station '${station.name}' with '${station.id}' and provider '${station.provider}'`,
+      );
+    }
   }
 }

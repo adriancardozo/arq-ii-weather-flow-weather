@@ -4,7 +4,7 @@ import { CreateStationInput } from 'src/bussiness/ports/input/services/dtos/inpu
 import { EditStationInput } from 'src/bussiness/ports/input/services/dtos/input/edit-station.input';
 import { Station } from 'src/bussiness/entities/station.entity';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { ClientSession, Model } from 'mongoose';
 import { MongoTransactionService } from '../services/mongo-transaction.service';
 import { StationNotFoundError } from 'src/bussiness/errors/station-not-found.error';
 import { Station as StationObject } from '../schemas/object/station-object.schema';
@@ -18,5 +18,9 @@ export class MongoStationRepository
     transactionService: MongoTransactionService,
   ) {
     super(StationObject, Station, StationNotFoundError, StationModel, transactionService, ['measurements']);
+  }
+
+  async findWithProvider(session?: ClientSession): Promise<Array<Station>> {
+    return await this.find({ provider: { $ne: null } as any as 'OpenWeatherMap' | null }, session);
   }
 }

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsIn, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { CreateStationInput } from 'src/bussiness/ports/input/services/dtos/input/create-station.input';
 import { Location } from 'src/bussiness/value-objects/location.value-object';
 
@@ -24,6 +24,10 @@ export class CreateStationDto {
   @IsNotEmpty()
   @IsString()
   owner_id: string;
+  @ApiProperty({ enum: ['OpenWeatherMap'], default: null, nullable: true, required: false })
+  @IsOptional()
+  @IsIn(['OpenWeatherMap', null])
+  provider: 'OpenWeatherMap' | null = null;
 
   toInput(): CreateStationInput {
     return new CreateStationInput(
@@ -31,6 +35,7 @@ export class CreateStationDto {
       new Location([this.longitude, this.latitude]),
       this.sensor_model,
       this.owner_id,
+      this.provider,
     );
   }
 }
