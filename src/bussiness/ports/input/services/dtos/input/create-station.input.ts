@@ -6,5 +6,6 @@ export class CreateStationInput {
     public location: Location,
     public sensorModel: string,
     public owner: string,
+    public provider: string | null,
   ) {}
 }

@@ -10,6 +10,7 @@ export const StationSchema = new Schema(
     },
     sensorModel: String,
     state: { type: String, enum: ['active', 'inactive'], default: 'active' },
+    provider: { type: String, default: null, required: false },
     owner: { type: String },
     subscribers: [{ type: String }],
     measurements: [{ type: Schema.Types.ObjectId, ref: Measurement.name }],
