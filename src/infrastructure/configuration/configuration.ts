@@ -18,6 +18,7 @@ const configuration = {
   jwt: { secret: process.env.JWT_SECRET! },
   service_bus: { connection_string: process.env.SERVICE_BUS_CONNECTION_STRING! },
   users: { url: process.env.USERS_URL! },
+  open_weather_map: { url: process.env.OPEN_WEATHER_MAP_URL!, api_key: process.env.OPEN_WEATHER_MAP_KEY! },
 };
 
 export type Configuration = typeof configuration;

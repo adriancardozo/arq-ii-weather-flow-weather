@@ -20,6 +20,7 @@ import { CreateStationDto } from './dtos/create-station.dto';
 import { EditStationDto } from './dtos/edit-station.dto';
 import { SubscribeDto } from './dtos/subscribe.dto';
 import { SubscribeResponse } from './responses/subscribe.response';
+import { StationTemperatureResponse } from './responses/station-temperature.response';
 
 @Controller('station')
 @UsePipes(VALIDATION_PIPE)
@@ -70,5 +71,12 @@ export class StationController {
   @Put(':id/subscribe/:user_id')
   async subscribe(@Param() param: SubscribeDto): Promise<SubscribeResponse> {
     return new SubscribeResponse(await this.stationService.subscribe(param.id, param.user_id));
+  }
+
+  @ApiOperation({ summary: 'Get current station temperature' })
+  @ApiOkResponse({ type: StationTemperatureResponse })
+  @Get(':id/current_temperature')
+  async getCurrentTemperature(@Param() param: IdDto): Promise<StationTemperatureResponse> {
+    return new StationTemperatureResponse(await this.stationService.getCurrentTemperature(param.id));
   }
 }
