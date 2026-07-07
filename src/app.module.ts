@@ -25,12 +25,14 @@ import { Measurement } from './bussiness/entities/measurement.entity';
 import { MeasurementSchema } from './adapters/secondary/mongo/schemas/document/measurement.schema';
 import { SearchController } from './adapters/primary/http/controllers/search.controller';
 import { ServiceBusQueueService } from './adapters/secondary/service-bus/services/service-bus-queue.service';
-import { ServiceBusClient } from '@azure/service-bus';
+import { ServiceBusAdministrationClient, ServiceBusClient } from '@azure/service-bus';
 import { IAlertService } from './bussiness/ports/output/services/i-alert.service';
 import { AlertService } from './adapters/secondary/users/services/alert.service';
 import { HttpModule } from '@nestjs/axios';
 import { UserStationService } from './adapters/secondary/users/services/user-station.service';
 import { IUserStationService } from './bussiness/ports/output/services/i-user-station.service';
+import { ServiceBusProcessorManager } from './adapters/primary/queue/helpers/service-bus-processor-manager.helper';
+import { MeasurementProcessor } from './adapters/primary/queue/processors/measurement.processor';
 
 const { mongo, jwt, service_bus } = configuration();
 
@@ -49,6 +51,12 @@ const { mongo, jwt, service_bus } = configuration();
   controllers: [AppController, MeasurementController, StationController, SearchController],
   providers: [
     { provide: ServiceBusClient, useValue: new ServiceBusClient(service_bus.connection_string) },
+    {
+      provide: ServiceBusAdministrationClient,
+      useValue: new ServiceBusAdministrationClient(service_bus.connection_string),
+    },
+    ServiceBusProcessorManager,
+    MeasurementProcessor,
     Logger,
     MeasurementService,
     { provide: IMeasurementService, useExisting: MeasurementService },

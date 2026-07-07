@@ -10,6 +10,7 @@ export class Station extends IEntity<EditStationInput> {
   location: Location;
   sensorModel: string;
   state: 'active' | 'inactive' = 'active';
+  provider: string | null;
   owner: string;
   subscribers: Array<string> = [];
   measurements: Array<Measurement>;
@@ -22,6 +23,7 @@ export class Station extends IEntity<EditStationInput> {
     sensorModel: string,
     owner: string,
     state: 'active' | 'inactive',
+    provider: string | null,
   );
   constructor(
     id: string,
@@ -30,6 +32,7 @@ export class Station extends IEntity<EditStationInput> {
     sensorModel?: string,
     owner?: string,
     state: 'active' | 'inactive' = 'active',
+    provider: string | null = null,
   ) {
     super();
     this.id = id;
@@ -39,15 +42,17 @@ export class Station extends IEntity<EditStationInput> {
       this.sensorModel = sensorModel;
       this.owner = owner;
       this.state = state;
+      this.provider = provider;
     }
   }
 
-  edit({ name, location, sensorModel, state, owner }: EditStationInput) {
+  edit({ name, location, sensorModel, state, owner, provider }: EditStationInput) {
     this.name = name ?? this.name;
     if (location) this.location.edit(location);
     this.sensorModel = sensorModel ?? this.sensorModel;
     this.state = state ?? this.state;
     if (owner?.id) this.setOwner(owner.id);
+    if (provider !== undefined) this.provider = provider;
   }
 
   setOwner(owner: string | null): void {
