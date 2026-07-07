@@ -12,14 +12,17 @@ import { SearchStationInput } from '../ports/input/services/dtos/input/search-st
 import { IUserStationService } from '../ports/output/services/i-user-station.service';
 import { Measurement } from '../entities/measurement.entity';
 import { IWeatherProviderService } from '../ports/output/services/i-weather-provider.service';
+import { AverageMeasurement } from '../aggregates/average-measurement.aggregate';
+import { IMeasurementRepository } from '../ports/output/repositories/i-measurement.repository';
 
 @Injectable()
 export class StationService<Session = any>
-  extends Service<Station, CreateStationInput, EditStationInput, Session>
+  extends Service<Station, CreateStationInput, EditStationInput, Session, IStationRepository>
   implements IStationService
 {
   constructor(
     private readonly userStationService: IUserStationService,
+    private readonly measurementRepository: IMeasurementRepository,
     private readonly weatherProviderService: IWeatherProviderService,
     stationRepository: IStationRepository,
     transactionService: ITransactionService,
@@ -86,6 +89,16 @@ export class StationService<Session = any>
     return await this.transactionService.transaction(async (session) => {
       const station = await this.getById(id, session);
       return await this.weatherProviderService.measure(station);
+    }, session);
+  }
+
+  async getAverage(id: string, period: 'day' | 'week', session?: Session): Promise<AverageMeasurement> {
+    return await this.transactionService.transaction(async (session) => {
+      const station = await this.getById(id, session);
+      const average = new AverageMeasurement().setPeriod(period).setStation(station);
+      const measurements = await this.measurementRepository.getLastMeasurements(id, average.from, session);
+      average.setMeasurements(measurements);
+      return average;
     }, session);
   }
 }

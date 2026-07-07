@@ -21,6 +21,7 @@ import { EditStationDto } from './dtos/edit-station.dto';
 import { SubscribeDto } from './dtos/subscribe.dto';
 import { SubscribeResponse } from './responses/subscribe.response';
 import { StationTemperatureResponse } from './responses/station-temperature.response';
+import { AverageTemperatureResponse } from './responses/average-temperature.response';
 
 @Controller('station')
 @UsePipes(VALIDATION_PIPE)
@@ -78,5 +79,19 @@ export class StationController {
   @Get(':id/current_temperature')
   async getCurrentTemperature(@Param() param: IdDto): Promise<StationTemperatureResponse> {
     return new StationTemperatureResponse(await this.stationService.getCurrentTemperature(param.id));
+  }
+
+  @ApiOperation({ summary: 'Day average station temperature' })
+  @ApiOkResponse({ type: AverageTemperatureResponse })
+  @Get(':id/average_day')
+  async getDayAverage(@Param() param: IdDto): Promise<AverageTemperatureResponse> {
+    return new AverageTemperatureResponse(await this.stationService.getAverage(param.id, 'day'));
+  }
+
+  @ApiOperation({ summary: 'Week average station temperature' })
+  @ApiOkResponse({ type: AverageTemperatureResponse })
+  @Get(':id/average_week')
+  async getWeekAverage(@Param() param: IdDto): Promise<AverageTemperatureResponse> {
+    return new AverageTemperatureResponse(await this.stationService.getAverage(param.id, 'week'));
   }
 }
