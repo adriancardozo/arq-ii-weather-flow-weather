@@ -14,6 +14,7 @@ import { Measurement } from '../entities/measurement.entity';
 import { IWeatherProviderService } from '../ports/output/services/i-weather-provider.service';
 import { AverageMeasurement } from '../aggregates/average-measurement.aggregate';
 import { IMeasurementRepository } from '../ports/output/repositories/i-measurement.repository';
+import { IProvidersSubscriberService } from '../ports/output/services/i-providers-subscriber.service';
 
 @Injectable()
 export class StationService<Session = any>
@@ -24,6 +25,7 @@ export class StationService<Session = any>
     private readonly userStationService: IUserStationService,
     private readonly measurementRepository: IMeasurementRepository,
     private readonly weatherProviderService: IWeatherProviderService,
+    private readonly providersSubscriberService: IProvidersSubscriberService,
     stationRepository: IStationRepository,
     transactionService: ITransactionService,
   ) {
@@ -33,6 +35,7 @@ export class StationService<Session = any>
   override async create(input: CreateStationInput, session?: Session): Promise<Station> {
     return await this.transactionService.transaction(async (session) => {
       const station = await super.create(input, session);
+      if (input.provider) await this.providersSubscriberService.sendToCreate(station);
       await this.userStationService.updateOwner(station.id, null, station.owner);
       return station;
     }, session);
@@ -40,10 +43,11 @@ export class StationService<Session = any>
 
   override async edit(id: string, input: EditStationInput, session?: Session): Promise<Station> {
     return await this.transactionService.transaction(async (session) => {
-      if (!input.owner) return await super.edit(id, input, session);
       const { owner: oldOwner } = await this.repository.findOneByOrFail({ id }, session);
       const station = await super.edit(id, input, session);
-      await this.userStationService.updateOwner(station.id, oldOwner, station.owner);
+      if (station.provider === null) await this.providersSubscriberService.sendToDelete(station);
+      else await this.providersSubscriberService.sendToEdit(station);
+      if (input.owner) await this.userStationService.updateOwner(station.id, oldOwner, station.owner);
       return station;
     }, session);
   }
@@ -51,6 +55,7 @@ export class StationService<Session = any>
   override async delete(id: string, session?: Session): Promise<Station> {
     return await this.transactionService.transaction(async (session) => {
       const station = await super.delete(id, session);
+      await this.providersSubscriberService.sendToDelete(station);
       await this.userStationService.updateOwner(station.id, station.owner, null);
       return station;
     }, session);
