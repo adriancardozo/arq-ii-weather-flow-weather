@@ -7,4 +7,6 @@ export abstract class IMeasurementRepository<Session = any> extends IRepository<
   Measurement,
   EditMeasurementInput,
   Session
-> {}
+> {
+  abstract getLastMeasurements(id: string, from: Date, session?: Session): Promise<Array<Measurement>>;
+}

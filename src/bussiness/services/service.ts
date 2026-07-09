@@ -2,9 +2,20 @@ import { IEntity } from '../entities/i.entity';
 import { IRepository } from '../ports/output/repositories/i.repository';
 import { ITransactionService } from '../ports/output/services/i-transaction.service';
 
-export abstract class Service<Entity extends IEntity<EditInput>, CreateInput, EditInput, Session = any> {
+export abstract class Service<
+  Entity extends IEntity<EditInput>,
+  CreateInput,
+  EditInput,
+  Session = any,
+  Repository extends IRepository<Entity, CreateInput, EditInput, Session> = IRepository<
+    Entity,
+    CreateInput,
+    EditInput,
+    Session
+  >,
+> {
   constructor(
-    protected readonly repository: IRepository<Entity, CreateInput, EditInput, Session>,
+    protected readonly repository: Repository,
     protected readonly transactionService: ITransactionService<Session>,
   ) {}
 
