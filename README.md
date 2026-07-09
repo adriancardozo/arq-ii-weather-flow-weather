@@ -41,6 +41,9 @@ USERS_URL=<users_url>
 PORT=3001
 OPEN_WEATHER_MAP_URL=<open_weather_map_url>
 OPEN_WEATHER_MAP_KEY=<open_weather_map_key>
+REDIS_CACHE_URL=<redis_cache_url (optional)>
+REDIS_CACHE_CONNECTION_TIMEOUT=<redis_cache_connection_timeout (default: 2000)>
+CACHE_DISABLED=<cache_disabled (default: false)>
 ```
 
 Start project
@@ -72,6 +75,9 @@ USERS_URL=<users_url>
 PORT=3001
 OPEN_WEATHER_MAP_URL=<open_weather_map_url>
 OPEN_WEATHER_MAP_KEY=<open_weather_map_key>
+REDIS_CACHE_URL=<redis_cache_url (optional)>
+REDIS_CACHE_CONNECTION_TIMEOUT=<redis_cache_connection_timeout (default: 2000)>
+CACHE_DISABLED=<cache_disabled (default: false)>
 ```
 
 Create a container from this image

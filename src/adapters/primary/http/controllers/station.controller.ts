@@ -8,6 +8,7 @@ import {
   Post,
   Put,
   UseFilters,
+  UseInterceptors,
   UsePipes,
 } from '@nestjs/common';
 import { VALIDATION_PIPE } from 'src/infrastructure/validation/validation.pipe';
@@ -22,6 +23,10 @@ import { SubscribeDto } from './dtos/subscribe.dto';
 import { SubscribeResponse } from './responses/subscribe.response';
 import { StationTemperatureResponse } from './responses/station-temperature.response';
 import { AverageTemperatureResponse } from './responses/average-temperature.response';
+import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
+import configuration from 'src/infrastructure/configuration/configuration';
+
+const { cache } = configuration();
 
 @Controller('station')
 @UsePipes(VALIDATION_PIPE)
@@ -83,6 +88,9 @@ export class StationController {
 
   @ApiOperation({ summary: 'Day average station temperature' })
   @ApiOkResponse({ type: AverageTemperatureResponse })
+  @CacheKey((context) => context.switchToHttp().getRequest().path)
+  @CacheTTL(cache.ttl.average_day)
+  @UseInterceptors(CacheInterceptor)
   @Get(':id/average_day')
   async getDayAverage(@Param() param: IdDto): Promise<AverageTemperatureResponse> {
     return new AverageTemperatureResponse(await this.stationService.getAverage(param.id, 'day'));
@@ -90,6 +98,9 @@ export class StationController {
 
   @ApiOperation({ summary: 'Week average station temperature' })
   @ApiOkResponse({ type: AverageTemperatureResponse })
+  @CacheKey((context) => context.switchToHttp().getRequest().path)
+  @CacheTTL(cache.ttl.average_week)
+  @UseInterceptors(CacheInterceptor)
   @Get(':id/average_week')
   async getWeekAverage(@Param() param: IdDto): Promise<AverageTemperatureResponse> {
     return new AverageTemperatureResponse(await this.stationService.getAverage(param.id, 'week'));

@@ -1,6 +1,19 @@
 import dotenv from 'dotenv';
+import { KeyvRedisOptions } from '@keyv/redis';
 
 dotenv.config({});
+
+const cache_disabled = process.env.CACHE_DISABLED ? process.env.CACHE_DISABLED === 'true' : false;
+
+function ttl(ttl: number): number {
+  return cache_disabled ? -1 : ttl;
+}
+
+const service_bus_connection_string = process.env.SERVICE_BUS_CONNECTION_STRING!;
+
+const emulator_string = 'UseDevelopmentEmulator=true';
+
+const service_bus_emulated = (service_bus_connection_string ?? '').includes(emulator_string);
 
 const configuration = {
   app: {
@@ -16,9 +29,17 @@ const configuration = {
   },
   mongo: { uri: process.env.MONGO_URI! },
   jwt: { secret: process.env.JWT_SECRET! },
-  service_bus: { connection_string: process.env.SERVICE_BUS_CONNECTION_STRING! },
+  service_bus: { connection_string: service_bus_connection_string, emulated: service_bus_emulated },
   users: { url: process.env.USERS_URL! },
   open_weather_map: { url: process.env.OPEN_WEATHER_MAP_URL!, api_key: process.env.OPEN_WEATHER_MAP_KEY! },
+  redis: {
+    url: process.env.REDIS_CACHE_URL,
+    options: { connectionTimeout: process.env.REDIS_CACHE_CONNECTION_TIMEOUT ?? 2000 } as KeyvRedisOptions,
+  },
+  cache: {
+    disabled: cache_disabled,
+    ttl: { average_day: ttl(60 * 60 * 1000), average_week: ttl(24 * 60 * 60 * 1000) },
+  },
 };
 
 export type Configuration = typeof configuration;

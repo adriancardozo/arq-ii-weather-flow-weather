@@ -23,5 +23,18 @@ services:
     networks:
       weather-flow:
 
+  redis:
+    image: redis:alpine
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+    networks:
+      weather-flow:
+
 networks:
   weather-flow:
