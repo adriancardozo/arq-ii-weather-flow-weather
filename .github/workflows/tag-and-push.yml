@@ -9,6 +9,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  ENVIRONMENT_VARIABLES: ${{ format(vars.ENVIRONMENT_VARIABLES, vars.MONGO_URI_SECRET_NAME, vars.JWT_SECRET_SECRET_NAME, vars.DNS_SERVERS, vars.SERVICE_BUS_CONNECTION_STRING_SECRET_NAME, vars.USERS_URL, vars.PORT, vars.OPEN_WEATHER_MAP_URL, vars.OPEN_WEATHER_MAP_KEY_SECRET_NAME, vars.REDIS_CACHE_URL_SECRET_NAME, vars.REDIS_CACHE_CONNECTION_TIMEOUT, vars.CACHE_DISABLED) }}
 jobs:
   create_tag_if_merged:
     if: github.event.pull_request.merged == true && startsWith(github.head_ref, 'feature-')
@@ -90,3 +91,45 @@ jobs:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
+  deploy-azure:
+    needs: [build-and-push-image]
+    if: github.event.pull_request.merged == true && startsWith(github.head_ref, 'feature-')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Retrieve version
+        id: version
+        run: |
+          echo "TAG_NAME=$(npm pkg get version | tr -d '"')" >> $GITHUB_OUTPUT
+      - name: 'Login with Azure'
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: 'Pull and push image'
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ format('https://{0}', vars.REGISTRY_URL) }}
+          username: ${{ vars.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+      - run: |
+          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.TAG_NAME }}
+          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.TAG_NAME }} ${{ vars.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.TAG_NAME }}
+          docker push ${{ vars.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.TAG_NAME }}
+      - name: Deploy to Container App
+        uses: azure/container-apps-deploy-action@v1
+        with:
+          imageToDeploy: ${{ vars.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.TAG_NAME }}
+          acrUsername: ${{ vars.REGISTRY_USERNAME }}
+          acrPassword: secretref:${{ vars.REGISTRY_PASSWORD_SECRET_NAME }}
+          environmentVariables: ${{ env.ENVIRONMENT_VARIABLES }}
+          targetPort: ${{ vars.PORT }}
+          containerAppName: ${{ vars.CONTAINER_APP_NAME }}
+          resourceGroup: ${{ vars.RESOURCE_GROUP_NAME }}
+      - name: 'Set Container App registry password secret'
+        run: |
+          az containerapp up --name ${{ vars.CONTAINER_APP_NAME }} --resource-group ${{ vars.RESOURCE_GROUP_NAME }} --image ${{ vars.REGISTRY_URL }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.TAG_NAME }} --registry-server ${{ vars.REGISTRY_URL }} --registry-username ${{ vars.REGISTRY_USERNAME }} --registry-password "secretref:${{ vars.REGISTRY_PASSWORD_SECRET_NAME }}"
+          az containerapp secret remove --name ${{ vars.CONTAINER_APP_NAME }} --resource-group ${{ vars.RESOURCE_GROUP_NAME }} --secret-names "${{ vars.REGISTRY_NAME }}azurecrio-${{ vars.REGISTRY_NAME }}"
+      - name: 'Azure logout'
+        run: |
+          az logout
