@@ -1,0 +1,22 @@
+global:
+  scrape_interval: 15s
+  external_labels:
+    monitor: 'codelab-monitor'
+
+scrape_configs:
+  - job_name: 'prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['localhost:9090']
+  - job_name: 'users'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['host.docker.internal:3000']
+  - job_name: 'weather'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['host.docker.internal:3001']
+  - job_name: 'providers'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['host.docker.internal:3002']

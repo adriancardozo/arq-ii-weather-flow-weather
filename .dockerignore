@@ -33,3 +33,5 @@ mercado-libre-token.json
 /test/resources/test-server
 
 /grafana-data
+
+/observability-data

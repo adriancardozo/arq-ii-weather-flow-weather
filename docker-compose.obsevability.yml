@@ -1,0 +1,54 @@
+services:
+  tempo:
+    image: grafana/tempo:latest
+    volumes:
+      - ./config/tempo.yml:/etc/tempo.yaml
+      - ./observability-data/tempo-data:/var/tempo
+    command: ['-config.file=/etc/tempo.yaml']
+    ports:
+      - '3200:3200'
+    networks:
+      weather-flow:
+
+  loki:
+    image: grafana/loki:latest
+    volumes:
+      - ./config/loki-config.yml:/mnt/config/loki-config.yaml
+    ports:
+      - '3100:3100'
+    networks:
+      weather-flow:
+
+  otel-collector:
+    image: otel/opentelemetry-collector:latest
+    volumes:
+      - ./config/collector-config.yml:/etc/otelcol/config.yaml
+    ports:
+      - '4317:4317'
+      - '4318:4318'
+    networks:
+      weather-flow:
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - 9090:9090
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      weather-flow:
+
+  grafana:
+    image: grafana/grafana-oss:latest
+    ports:
+      - 3003:3000
+    restart: unless-stopped
+    volumes:
+      - ./observability-data/grafana-data:/var/lib/grafana
+    networks:
+      weather-flow:
+
+networks:
+  weather-flow:

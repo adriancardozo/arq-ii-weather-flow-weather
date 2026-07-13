@@ -17,8 +17,9 @@ const service_bus_emulated = (service_bus_connection_string ?? '').includes(emul
 
 const configuration = {
   app: {
-    title: 'Weather Flow',
-    description: 'Weather Flow API (Arquitectura de Software II)',
+    title: 'Weather Flow - Weather',
+    description: 'Weather Flow - Weather API (Arquitectura de Software II)',
+    service_name: 'weather',
     port: process.env.PORT ? parseInt(process.env.PORT, 10) : 3000,
     version: process.env.SELF_VERSION ?? '-',
     api_version: process.env.SELF_VERSION ?? '-',
@@ -40,6 +41,7 @@ const configuration = {
     disabled: cache_disabled,
     ttl: { average_day: ttl(60 * 60 * 1000), average_week: ttl(24 * 60 * 60 * 1000) },
   },
+  insights: { connection_string: process.env.APPLICATIONINSIGHTS_CONNECTION_STRING },
 };
 
 export type Configuration = typeof configuration;
