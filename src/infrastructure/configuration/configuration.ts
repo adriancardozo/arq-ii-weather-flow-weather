@@ -42,6 +42,10 @@ const configuration = {
     ttl: { average_day: ttl(60 * 60 * 1000), average_week: ttl(24 * 60 * 60 * 1000) },
   },
   insights: { connection_string: process.env.APPLICATIONINSIGHTS_CONNECTION_STRING },
+  timeout: {
+    open_weather_map: parseInt(process.env.OPEN_WEATHER_MAP_TIMEOUT ?? '2000'),
+    users_timeout: 2000,
+  },
 };
 
 export type Configuration = typeof configuration;
