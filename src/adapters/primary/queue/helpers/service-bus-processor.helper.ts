@@ -8,6 +8,7 @@ import {
 } from '@azure/service-bus';
 import { Logger, Type } from '@nestjs/common';
 import { VALIDATION_PIPE } from 'src/infrastructure/validation/validation.pipe';
+import { QueueMetricsMiddleware } from '../middlewares/queue-metrics.middleware';
 
 export class ServiceBusProcessor<T = any> {
   private readonly logger: Logger;
@@ -23,6 +24,7 @@ export class ServiceBusProcessor<T = any> {
       | ((data: T) => Promise<void>)
       | ((data: T, message: ServiceBusMessage) => Promise<void>),
     private readonly DtoClass?: Type<T>,
+    private readonly middlewares: Array<QueueMetricsMiddleware> = [],
   ) {
     this.logger = new Logger(`${ServiceBusProcessor.name} - ${this.queue}`);
   }
@@ -57,11 +59,13 @@ export class ServiceBusProcessor<T = any> {
       this.logger.log(
         `Processing message '${message.messageId?.toString() ?? ''}' from '${this.queue}' queue`,
       );
-      const body: T = await VALIDATION_PIPE.transform(message.body, {
-        type: 'body',
-        metatype: this.DtoClass,
+      await this.applyMiddlewares(async () => {
+        const body: T = await VALIDATION_PIPE.transform(message.body, {
+          type: 'body',
+          metatype: this.DtoClass,
+        });
+        await this.callback(body, message);
       });
-      await this.callback(body, message);
       this.logger.log(
         `Processed message '${message.messageId?.toString() ?? ''}' from '${this.queue}' queue`,
       );
@@ -77,5 +81,17 @@ export class ServiceBusProcessor<T = any> {
     this.logger.error(`Error processing message from '${this.queue}' queue`);
     this.logger.error(error);
     await Promise.resolve();
+  }
+
+  private async applyMiddlewares<T>(callback: () => Promise<T>) {
+    const composed = this.composeMiddlewares(this.middlewares, async () => await callback());
+    return await composed();
+  }
+
+  private composeMiddlewares<T>(middlewares: Array<QueueMetricsMiddleware>, callback: () => Promise<T>) {
+    if (middlewares.length === 0) return async () => callback();
+    else
+      return async () =>
+        await middlewares[0].use(this.queue, await this.composeMiddlewares(middlewares.slice(1), callback));
   }
 }

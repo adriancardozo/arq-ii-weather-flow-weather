@@ -2,11 +2,13 @@ import { ServiceBusClient, ServiceBusAdministrationClient } from '@azure/service
 import { ServiceBusProcessor } from './service-bus-processor.helper';
 import { Injectable, Type } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { QueueMetricsMiddleware } from '../middlewares/queue-metrics.middleware';
 
 @Injectable()
 export class ServiceBusProcessorManager {
   private readonly processors: Array<ServiceBusProcessor> = [];
   private readonly emulated: boolean;
+  private readonly middlewares: Array<QueueMetricsMiddleware> = [new QueueMetricsMiddleware()];
 
   constructor(
     private readonly client: ServiceBusClient,
@@ -30,7 +32,15 @@ export class ServiceBusProcessorManager {
 
   add<T>(queue: string, callback: (data: T) => Promise<void>, DtoClass?: Type<T>) {
     this.processors.push(
-      new ServiceBusProcessor<T>(this.client, this.adminClient, this.emulated, queue, callback, DtoClass),
+      new ServiceBusProcessor<T>(
+        this.client,
+        this.adminClient,
+        this.emulated,
+        queue,
+        callback,
+        DtoClass,
+        this.middlewares,
+      ),
     );
   }
 }
