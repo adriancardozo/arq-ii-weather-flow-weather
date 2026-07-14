@@ -6,11 +6,16 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Configuration } from './infrastructure/configuration/configuration';
 import { CONFIG_SERVICE } from './infrastructure/configuration/config.service';
 import dns from 'dns';
+import { OpenTelemetryLoggerService } from './infrastructure/logger/open-telemetry-logger.service';
 
 async function bootstrap() {
   const appConfig = CONFIG_SERVICE.get<Configuration['app']>('app')!;
   dns.setServers(appConfig.dns_servers);
-  const app = await NestFactory.create(AppModule, appConfig.options);
+  const app = await NestFactory.create(AppModule, {
+    logger: new OpenTelemetryLoggerService(),
+    ...appConfig.options,
+  });
+  app.useLogger(app.get(OpenTelemetryLoggerService));
   const config = new DocumentBuilder()
     .setTitle(appConfig.title)
     .setDescription(appConfig.description)
