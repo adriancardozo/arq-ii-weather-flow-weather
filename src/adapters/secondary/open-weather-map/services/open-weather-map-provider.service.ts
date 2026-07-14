@@ -7,12 +7,15 @@ import { Configuration } from 'src/infrastructure/configuration/configuration';
 import { OpenWeatherMapMeasurement } from './types/open-weather-map-measurement.type';
 import { firstValueFrom } from 'rxjs';
 import { Injectable } from '@nestjs/common';
+import { CircuitBreaker } from './helpers/circuit-breaker.helper';
+import { ProviderError } from 'src/bussiness/errors/provider-error.error';
 
 @Injectable()
 export class OpenWeatherMapProviderService implements IWeatherProviderService {
   private readonly url: string;
   private readonly apiKey: string;
   private readonly timeout: Configuration['timeout'];
+  private readonly circuitBreakers: Record<string, CircuitBreaker>;
 
   constructor(
     private readonly httpService: HttpService,
@@ -23,16 +26,29 @@ export class OpenWeatherMapProviderService implements IWeatherProviderService {
     this.timeout = this.configService.get<Configuration['timeout']>('timeout')!;
     this.url = `${baseUrl}/weather`;
     this.apiKey = api_key;
+    const circuit_options = this.configService.get<Configuration['circuit_breakers']['open_weather_map']>(
+      'circuit_breakers.open_weather_map',
+    )!;
+    this.circuitBreakers = {
+      measure: new CircuitBreaker(
+        circuit_options.failure_threshold,
+        circuit_options.reset_timeouts,
+        ProviderError,
+      ),
+    };
   }
 
   async measure(station: Station): Promise<Measurement> {
-    const { location } = station;
-    const result = this.httpService.get<OpenWeatherMapMeasurement>(
-      `${this.url}?lat=${location.latitude}&lon=${location.longitude}&units=metric&appid=${this.apiKey}`,
-      { timeout: this.timeout.open_weather_map },
-    );
-    const { data } = await firstValueFrom(result);
-    const { pressure, temp: temperature, humidity } = data.main;
-    return new Measurement(undefined, pressure, temperature, humidity, station, new Date());
+    const { measure: circuitBreaker } = this.circuitBreakers;
+    return await circuitBreaker.execute(async () => {
+      const { location } = station;
+      const result = this.httpService.get<OpenWeatherMapMeasurement>(
+        `${this.url}?lat=${location.latitude}&lon=${location.longitude}&units=metric&appid=${this.apiKey}`,
+        { timeout: this.timeout.open_weather_map },
+      );
+      const { data } = await firstValueFrom(result);
+      const { pressure, temp: temperature, humidity } = data.main;
+      return new Measurement(undefined, pressure, temperature, humidity, station, new Date());
+    });
   }
 }

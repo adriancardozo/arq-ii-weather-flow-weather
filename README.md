@@ -45,6 +45,8 @@ REDIS_CACHE_URL=<redis_cache_url (optional)>
 REDIS_CACHE_CONNECTION_TIMEOUT=<redis_cache_connection_timeout (default: 2000)>
 CACHE_DISABLED=<cache_disabled (default: false)>
 OPEN_WEATHER_MAP_TIMEOUT=<open_weather_map_timeout (default: 2000)>
+OPEN_WEATHER_MAP_CB_THRESHOLD=<open_weather_map_circuit_breaker_threshold (default: 10)>
+OPEN_WEATHER_MAP_CB_TIMEOUT=<open_weather_map_circuit_breaker_timeout (default 2 minutes: 120000)>
 ```
 
 Start project
@@ -80,6 +82,8 @@ REDIS_CACHE_URL=<redis_cache_url (optional)>
 REDIS_CACHE_CONNECTION_TIMEOUT=<redis_cache_connection_timeout (default: 2000)>
 CACHE_DISABLED=<cache_disabled (default: false)>
 OPEN_WEATHER_MAP_TIMEOUT=<open_weather_map_timeout (default: 2000)>
+OPEN_WEATHER_MAP_CB_THRESHOLD=<open_weather_map_circuit_breaker_threshold (default: 10)>
+OPEN_WEATHER_MAP_CB_TIMEOUT=<open_weather_map_circuit_breaker_timeout (default 2 minutes: 120000)>
 ```
 
 Create a container from this image

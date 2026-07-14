@@ -46,6 +46,12 @@ const configuration = {
     open_weather_map: parseInt(process.env.OPEN_WEATHER_MAP_TIMEOUT ?? '2000'),
     users_timeout: 2000,
   },
+  circuit_breakers: {
+    open_weather_map: {
+      failure_threshold: parseInt(process.env.OPEN_WEATHER_MAP_CB_THRESHOLD ?? '10'),
+      reset_timeouts: parseInt(process.env.OPEN_WEATHER_MAP_CB_TIMEOUT ?? `${2 * 60 * 1000}`),
+    },
+  },
 };
 
 export type Configuration = typeof configuration;
