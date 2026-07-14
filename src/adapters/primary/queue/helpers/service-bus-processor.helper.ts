@@ -55,26 +55,26 @@ export class ServiceBusProcessor<T = any> {
   }
 
   private async process(message: ServiceBusMessage): Promise<void> {
-    try {
-      this.logger.log(
-        `Processing message '${message.messageId?.toString() ?? ''}' from '${this.queue}' queue`,
-      );
-      await this.applyMiddlewares(async () => {
+    await this.applyMiddlewares(async () => {
+      try {
+        this.logger.log(
+          `Processing message '${message.messageId?.toString() ?? ''}' from '${this.queue}' queue`,
+        );
         const body: T = await VALIDATION_PIPE.transform(message.body, {
           type: 'body',
           metatype: this.DtoClass,
         });
         await this.callback(body, message);
-      }, message);
-      this.logger.log(
-        `Processed message '${message.messageId?.toString() ?? ''}' from '${this.queue}' queue`,
-      );
-    } catch (error) {
-      this.logger.error(
-        `Error processing message '${message.messageId?.toString() ?? ''}' from '${this.queue}' queue`,
-      );
-      throw error;
-    }
+        this.logger.log(
+          `Processed message '${message.messageId?.toString() ?? ''}' from '${this.queue}' queue`,
+        );
+      } catch (error) {
+        this.logger.error(
+          `Error processing message '${message.messageId?.toString() ?? ''}' from '${this.queue}' queue`,
+        );
+        throw error;
+      }
+    }, message);
   }
 
   private async error({ error }: ProcessErrorArgs): Promise<void> {
