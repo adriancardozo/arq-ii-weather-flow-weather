@@ -3,12 +3,17 @@ import { ServiceBusProcessor } from './service-bus-processor.helper';
 import { Injectable, Type } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { QueueMetricsMiddleware } from '../middlewares/queue-metrics.middleware';
+import { QueueMiddleware } from '../middlewares/queue.middleware';
+import { QueueTracesMiddleware } from '../middlewares/queue-traces.middleware';
 
 @Injectable()
 export class ServiceBusProcessorManager {
   private readonly processors: Array<ServiceBusProcessor> = [];
   private readonly emulated: boolean;
-  private readonly middlewares: Array<QueueMetricsMiddleware> = [new QueueMetricsMiddleware()];
+  private readonly middlewares: Array<QueueMiddleware> = [
+    new QueueTracesMiddleware(),
+    new QueueMetricsMiddleware(),
+  ];
 
   constructor(
     private readonly client: ServiceBusClient,

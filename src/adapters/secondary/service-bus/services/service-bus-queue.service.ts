@@ -1,5 +1,6 @@
-import { ServiceBusClient } from '@azure/service-bus';
+import { ServiceBusClient, ServiceBusMessage } from '@azure/service-bus';
 import { Injectable, Logger } from '@nestjs/common';
+import { context, propagation } from '@opentelemetry/api';
 import { UnknownError } from 'src/bussiness/errors/unknown.error';
 
 @Injectable()
@@ -12,7 +13,9 @@ export class ServiceBusQueueService {
     const sender = this.client.createSender(queue);
     try {
       this.logger.log(`Sending message to '${queue}' queue`);
-      await sender.sendMessages([{ body: data }]);
+      const message: ServiceBusMessage = { body: data, applicationProperties: {} };
+      propagation.inject(context.active(), message.applicationProperties);
+      await sender.sendMessages([message]);
       this.logger.log(`Message sent to '${queue}' queue`);
       await sender.close();
     } catch (error) {

@@ -1,13 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { Meter, metrics } from '@opentelemetry/api';
+import { QueueMiddleware } from './queue.middleware';
+import { ServiceBusMessage } from '@azure/service-bus';
 
 @Injectable()
-export class QueueMetricsMiddleware {
+export class QueueMetricsMiddleware implements QueueMiddleware {
   private readonly meter: Meter = metrics.getMeter('azure_service_bus');
   private readonly counter = this.meter.createCounter('messaging.client.messages_total');
   private readonly histogram = this.meter.createHistogram('messaging.client.operation.duration');
 
-  async use<T>(queue: string, callback: () => Promise<T>) {
+  async use<T>(queue: string, callback: () => Promise<T>, message: ServiceBusMessage) {
     const start = new Date().getTime();
     const succededAttributes = {
       queue,
