@@ -52,6 +52,12 @@ const configuration = {
       reset_timeouts: parseInt(process.env.OPEN_WEATHER_MAP_CB_TIMEOUT ?? `${2 * 60 * 1000}`),
     },
   },
+  open_telemetry: {
+    protocol:
+      { 'http/protobuf': 'proto', 'http/json': 'http', grpc: 'grpc' }[
+        process.env.OTEL_EXPORTER_OTLP_PROTOCOL ?? 'http/protobuf'
+      ] ?? 'proto',
+  },
 };
 
 export type Configuration = typeof configuration;
